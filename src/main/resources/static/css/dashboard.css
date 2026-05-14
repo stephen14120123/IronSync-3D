@@ -1,0 +1,108 @@
+#three-canvas-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    z-index: 0;
+}
+
+.glass-card {
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 260px;
+    padding: 24px;
+    background: var(--bg-glass);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    z-index: 10;
+    transition: transform 0.3s ease;
+}
+.glass-card:hover {
+    transform: translateY(-50%) scale(1.03);
+}
+.glass-card.left {
+    left: 32px;
+}
+.glass-card.right {
+    right: 32px;
+}
+
+.glass-card h3 {
+    font-size: 13px;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 16px;
+}
+.glass-card .stat-item {
+    display: flex;
+    justify-content: space-between;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 14px;
+}
+.glass-card .stat-item:last-child {
+    border-bottom: none;
+}
+.glass-card .stat-value {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.ring-progress {
+    display: flex;
+    justify-content: center;
+    margin: 12px 0;
+}
+.ring-progress svg {
+    width: 120px;
+    height: 120px;
+    transform: rotate(-90deg);
+}
+.ring-progress .bg {
+    fill: none;
+    stroke: rgba(255,255,255,0.06);
+    stroke-width: 8;
+}
+.ring-progress .fg {
+    fill: none;
+    stroke: var(--accent-green);
+    stroke-width: 8;
+    stroke-linecap: round;
+    transition: stroke-dashoffset 0.6s ease;
+}
+.ring-progress .center-label {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text-primary);
+}
+.ring-progress .center-label small {
+    font-size: 11px;
+    color: var(--text-secondary);
+    font-weight: 400;
+}
+
+#hint-overlay {
+    position: fixed;
+    bottom: 48px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(8px);
+    padding: 12px 24px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    font-size: 13px;
+    z-index: 10;
+    pointer-events: none;
+}

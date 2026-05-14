@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ironsync.mapper.BodyMetricsMapper">
+
+    <resultMap id="BaseResultMap" type="com.ironsync.entity.BodyMetrics">
+        <id property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="recordDate" column="record_date"/>
+        <result property="weightKg" column="weight_kg"/>
+        <result property="bodyFatPercentage" column="body_fat_percentage"/>
+        <result property="note" column="note"/>
+    </resultMap>
+
+    <sql id="BaseColumns">
+        id, user_id, record_date, weight_kg, body_fat_percentage, note
+    </sql>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO body_metrics (user_id, record_date, weight_kg, body_fat_percentage, note)
+        VALUES (#{userId}, #{recordDate}, #{weightKg}, #{bodyFatPercentage}, #{note})
+    </insert>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT <include refid="BaseColumns"/>
+        FROM body_metrics
+        WHERE id = #{id}
+    </select>
+
+    <update id="update">
+        UPDATE body_metrics
+        <set>
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="recordDate != null">record_date = #{recordDate},</if>
+            <if test="weightKg != null">weight_kg = #{weightKg},</if>
+            <if test="bodyFatPercentage != null">body_fat_percentage = #{bodyFatPercentage},</if>
+            <if test="note != null">note = #{note},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM body_metrics WHERE id = #{id}
+    </delete>
+
+    <select id="selectByDateRange" resultMap="BaseResultMap">
+        SELECT <include refid="BaseColumns"/>
+        FROM body_metrics
+        WHERE user_id = #{userId}
+        AND record_date BETWEEN #{from} AND #{to}
+        ORDER BY record_date ASC
+    </select>
+
+</mapper>

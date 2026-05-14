@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>饮食情绪 — IronSync-3D</title>
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/diet-mood.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
+</head>
+<body>
+    <div id="top-bar">
+        <div class="logo">IRON<span>SYNC</span> 3D</div>
+        <nav>
+            <a href="/">仪表盘</a>
+            <a href="/training.html">训练记录</a>
+            <a href="/supplements.html">补剂管家</a>
+            <a href="/diet-mood.html" class="active">饮食情绪</a>
+            <a href="/body-metrics.html">身体指标</a>
+            <a href="/mcp-search.html">日记检索</a>
+            <a href="/test-report.html">测试报告</a>
+        </nav>
+    </div>
+
+    <div class="page-container">
+        <div id="chart-container">
+            <div id="dietMoodChart"></div>
+        </div>
+
+        <div class="content-grid">
+            <div class="form-panel">
+                <h3>录入饮食与情绪</h3>
+                <form id="dietForm">
+                    <label>日期
+                        <input type="date" name="recordDate" required>
+                    </label>
+                    <label>碳水 (g)
+                        <input type="number" name="carbsG" step="0.1" min="0" required>
+                    </label>
+                    <label>蛋白质 (g)
+                        <input type="number" name="proteinG" step="0.1" min="0" required>
+                    </label>
+                    <label>脂肪 (g)
+                        <input type="number" name="fatG" step="0.1" min="0" required>
+                    </label>
+                    <label>情绪评分
+                        <input type="range" name="moodScore" min="1" max="10" value="6"
+                               oninput="document.getElementById('moodVal').textContent=this.value">
+                        <span id="moodVal" class="range-val">6</span>
+                    </label>
+                    <label>备注
+                        <input type="text" name="note" maxlength="500">
+                    </label>
+                    <button type="submit">保存</button>
+                </form>
+            </div>
+
+            <div class="history-panel">
+                <h3>历史记录</h3>
+                <div class="table-wrap">
+                    <table id="dietTable">
+                        <thead>
+                            <tr><th>日期</th><th>碳水</th><th>蛋白质</th><th>脂肪</th><th>情绪</th><th>备注</th><th>操作</th></tr>
+                        </thead>
+                        <tbody id="dietBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/diet-mood.js"></script>
+</body>
+</html>

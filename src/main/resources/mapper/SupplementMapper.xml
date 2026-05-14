@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ironsync.mapper.SupplementMapper">
+
+    <resultMap id="BaseResultMap" type="com.ironsync.entity.Supplement">
+        <id property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="name" column="name"/>
+        <result property="currentStockG" column="current_stock_g"/>
+        <result property="dailyConsumptionG" column="daily_consumption_g"/>
+        <result property="status" column="status"/>
+        <result property="createdAt" column="created_at"/>
+    </resultMap>
+
+    <sql id="BaseColumns">
+        id, user_id, name, current_stock_g, daily_consumption_g, status, created_at
+    </sql>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO supplement (user_id, name, current_stock_g, daily_consumption_g, status, created_at)
+        VALUES (#{userId}, #{name}, #{currentStockG}, #{dailyConsumptionG}, #{status}, #{createdAt})
+    </insert>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT <include refid="BaseColumns"/>
+        FROM supplement
+        WHERE id = #{id}
+    </select>
+
+    <update id="update">
+        UPDATE supplement
+        <set>
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="name != null">name = #{name},</if>
+            <if test="currentStockG != null">current_stock_g = #{currentStockG},</if>
+            <if test="dailyConsumptionG != null">daily_consumption_g = #{dailyConsumptionG},</if>
+            <if test="status != null">status = #{status},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM supplement WHERE id = #{id}
+    </delete>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT <include refid="BaseColumns"/>
+        FROM supplement
+        ORDER BY FIELD(status, '告急', '偏低', '充足'), created_at ASC
+    </select>
+
+</mapper>

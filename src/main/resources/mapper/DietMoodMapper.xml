@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ironsync.mapper.DietMoodMapper">
+
+    <resultMap id="BaseResultMap" type="com.ironsync.entity.DietMood">
+        <id property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="recordDate" column="record_date"/>
+        <result property="carbsG" column="carbs_g"/>
+        <result property="proteinG" column="protein_g"/>
+        <result property="fatG" column="fat_g"/>
+        <result property="moodScore" column="mood_score"/>
+        <result property="note" column="note"/>
+    </resultMap>
+
+    <sql id="BaseColumns">
+        id, user_id, record_date, carbs_g, protein_g, fat_g, mood_score, note
+    </sql>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO diet_mood (user_id, record_date, carbs_g, protein_g, fat_g, mood_score, note)
+        VALUES (#{userId}, #{recordDate}, #{carbsG}, #{proteinG}, #{fatG}, #{moodScore}, #{note})
+    </insert>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT <include refid="BaseColumns"/>
+        FROM diet_mood
+        WHERE id = #{id}
+    </select>
+
+    <update id="update">
+        UPDATE diet_mood
+        <set>
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="recordDate != null">record_date = #{recordDate},</if>
+            <if test="carbsG != null">carbs_g = #{carbsG},</if>
+            <if test="proteinG != null">protein_g = #{proteinG},</if>
+            <if test="fatG != null">fat_g = #{fatG},</if>
+            <if test="moodScore != null">mood_score = #{moodScore},</if>
+            <if test="note != null">note = #{note},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM diet_mood WHERE id = #{id}
+    </delete>
+
+    <select id="selectByDateRange" resultMap="BaseResultMap">
+        SELECT <include refid="BaseColumns"/>
+        FROM diet_mood
+        WHERE user_id = #{userId}
+        AND record_date BETWEEN #{from} AND #{to}
+        ORDER BY record_date ASC
+    </select>
+
+</mapper>

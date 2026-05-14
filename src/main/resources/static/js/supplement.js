@@ -1,0 +1,132 @@
+let allSupplements = [];
+let editingId = null;
+
+const $ = id => document.getElementById(id);
+const modal = $('modal');
+const modalTitle = $('modalTitle');
+const modalForm = $('modalForm');
+
+// ---- Render ----
+function renderCards(list) {
+    const grid = $('supplementGrid');
+    if (!list.length) {
+        grid.innerHTML = '<div style="color:#666;text-align:center;padding:60px 0;">暂无补剂数据</div>';
+        return;
+    }
+    grid.innerHTML = list.map(s => {
+        const days = s.dailyConsumptionG > 0
+            ? Math.floor(s.currentStockG / s.dailyConsumptionG) : 0;
+        const pct = s.dailyConsumptionG > 0
+            ? Math.min(100, (s.currentStockG / (s.dailyConsumptionG * 60)) * 100) : 0;
+        const fillClass = s.status === '告急' ? 'red' : s.status === '偏低' ? 'orange' : 'green';
+
+        return `
+            <div class="sup-card status-${s.status}">
+                <h4>${s.name}</h4>
+                <div class="meta">
+                    <span>库存 ${s.currentStockG}g</span>
+                    <span>日耗 ${s.dailyConsumptionG}g</span>
+                </div>
+                <div class="progress-track">
+                    <div class="progress-fill ${fillClass}" style="width:${Math.min(pct,100)}%"></div>
+                </div>
+                <div class="days-label">约可维持 ${days} 天</div>
+                <div class="card-actions">
+                    <button class="edit-btn" data-id="${s.id}">编辑</button>
+                    <button class="del-btn" data-id="${s.id}">删除</button>
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    grid.querySelectorAll('.edit-btn').forEach(b =>
+        b.addEventListener('click', () => openEdit(b.dataset.id))
+    );
+    grid.querySelectorAll('.del-btn').forEach(b =>
+        b.addEventListener('click', () => delSup(b.dataset.id))
+    );
+}
+
+// ---- CRUD ----
+async function loadData() {
+    try {
+        allSupplements = await api.get('/supplements') || [];
+    } catch (_) { allSupplements = []; }
+    applyFilter();
+}
+
+function applyFilter() {
+    const kw = $('searchInput').value.toLowerCase().trim();
+    const filtered = kw
+        ? allSupplements.filter(s => s.name.toLowerCase().includes(kw))
+        : allSupplements;
+    renderCards(filtered);
+}
+
+async function delSup(id) {
+    if (!confirm('确认删除此补剂？')) return;
+    try {
+        await api.del('/supplements/' + id);
+        showToast('已删除', 'success');
+        loadData();
+    } catch (_) {}
+}
+
+// ---- Modal ----
+function openModal() {
+    modal.style.display = 'flex';
+    document.body.style.overflow = 'hidden';
+}
+
+function closeModal() {
+    modal.style.display = 'none';
+    document.body.style.overflow = '';
+}
+
+function openAdd() {
+    editingId = null;
+    modalTitle.textContent = '新增补剂';
+    modalForm.reset();
+    modalForm.elements['id'].value = '';
+    openModal();
+}
+
+function openEdit(id) {
+    const sup = allSupplements.find(s => s.id == id);
+    if (!sup) return;
+    editingId = id;
+    modalTitle.textContent = '编辑补剂';
+    modalForm.elements['id'].value = sup.id;
+    modalForm.elements['name'].value = sup.name;
+    modalForm.elements['currentStockG'].value = sup.currentStockG;
+    modalForm.elements['dailyConsumptionG'].value = sup.dailyConsumptionG;
+    openModal();
+}
+
+modalForm.addEventListener('submit', async e => {
+    e.preventDefault();
+    const fd = new FormData(modalForm);
+    const data = {
+        name: fd.get('name'),
+        currentStockG: parseFloat(fd.get('currentStockG')),
+        dailyConsumptionG: parseFloat(fd.get('dailyConsumptionG'))
+    };
+    try {
+        if (editingId) {
+            await api.put('/supplements/' + editingId, data);
+            showToast('已更新', 'success');
+        } else {
+            await api.post('/supplements', data);
+            showToast('已添加', 'success');
+        }
+        closeModal();
+        loadData();
+    } catch (_) {}
+});
+
+$('modalCancel').addEventListener('click', closeModal);
+$('addBtn').addEventListener('click', openAdd);
+$('searchInput').addEventListener('input', applyFilter);
+
+// ---- Init ----
+loadData();

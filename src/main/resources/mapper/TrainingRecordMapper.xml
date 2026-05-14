@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ironsync.mapper.TrainingRecordMapper">
+
+    <resultMap id="BaseResultMap" type="com.ironsync.entity.TrainingRecord">
+        <id property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="actionName" column="action_name"/>
+        <result property="weightKg" column="weight_kg"/>
+        <result property="reps" column="reps"/>
+        <result property="sets" column="sets"/>
+        <result property="rpe" column="rpe"/>
+        <result property="recordDate" column="record_date"/>
+        <result property="deleted" column="deleted"/>
+    </resultMap>
+
+    <sql id="BaseColumns">
+        id, user_id, action_name, weight_kg, reps, sets, rpe, record_date, deleted
+    </sql>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO training_record (user_id, action_name, weight_kg, reps, sets, rpe, record_date, deleted)
+        VALUES (#{userId}, #{actionName}, #{weightKg}, #{reps}, #{sets}, #{rpe}, #{recordDate}, #{deleted})
+    </insert>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT <include refid="BaseColumns"/>
+        FROM training_record
+        WHERE id = #{id}
+    </select>
+
+    <update id="update">
+        UPDATE training_record
+        <set>
+            <if test="userId != null">user_id = #{userId},</if>
+            <if test="actionName != null">action_name = #{actionName},</if>
+            <if test="weightKg != null">weight_kg = #{weightKg},</if>
+            <if test="reps != null">reps = #{reps},</if>
+            <if test="sets != null">sets = #{sets},</if>
+            <if test="rpe != null">rpe = #{rpe},</if>
+            <if test="recordDate != null">record_date = #{recordDate},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        UPDATE training_record SET deleted = 1 WHERE id = #{id}
+    </delete>
+
+    <select id="selectByRecordDate" resultMap="BaseResultMap">
+        SELECT <include refid="BaseColumns"/>
+        FROM training_record
+        WHERE record_date = #{date} AND deleted = 0
+    </select>
+
+    <select id="selectAll" resultMap="BaseResultMap">
+        SELECT <include refid="BaseColumns"/>
+        FROM training_record
+        WHERE user_id = #{userId} AND deleted = 0
+        ORDER BY record_date DESC, id DESC
+    </select>
+
+</mapper>

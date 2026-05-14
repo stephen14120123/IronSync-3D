@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ironsync.mapper.UserProfileMapper">
+
+    <resultMap id="BaseResultMap" type="com.ironsync.entity.UserProfile">
+        <id property="id" column="id"/>
+        <result property="heightCm" column="height_cm"/>
+        <result property="goal" column="goal"/>
+        <result property="createdAt" column="created_at"/>
+    </resultMap>
+
+    <sql id="BaseColumns">
+        id, height_cm, goal, created_at
+    </sql>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO user_profile (height_cm, goal, created_at)
+        VALUES (#{heightCm}, #{goal}, #{createdAt})
+    </insert>
+
+    <select id="selectById" resultMap="BaseResultMap">
+        SELECT <include refid="BaseColumns"/>
+        FROM user_profile
+        WHERE id = #{id}
+    </select>
+
+    <update id="update">
+        UPDATE user_profile
+        <set>
+            <if test="heightCm != null">height_cm = #{heightCm},</if>
+            <if test="goal != null">goal = #{goal},</if>
+        </set>
+        WHERE id = #{id}
+    </update>
+
+    <delete id="deleteById">
+        DELETE FROM user_profile WHERE id = #{id}
+    </delete>
+
+</mapper>

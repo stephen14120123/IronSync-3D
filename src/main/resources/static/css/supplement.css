@@ -1,0 +1,188 @@
+.toolbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+}
+.search-box {
+    background: #2A2A2A;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 16px;
+    color: var(--text-primary);
+    font-size: 14px;
+    width: 280px;
+    outline: none;
+    transition: border-color 0.2s;
+}
+.search-box:focus {
+    border-color: var(--accent-blue);
+}
+
+.btn-primary {
+    background: var(--accent-blue);
+    color: #fff;
+    border: none;
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: opacity 0.2s;
+}
+.btn-primary:hover { opacity: 0.85; }
+
+.btn-secondary {
+    background: transparent;
+    color: var(--text-secondary);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 20px;
+    font-size: 14px;
+    cursor: pointer;
+}
+
+/* ---- Card Grid ---- */
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(270px, 1fr));
+    gap: 20px;
+}
+
+.sup-card {
+    background: var(--bg-card);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    padding: 20px;
+    transition: border-color 0.3s, transform 0.2s;
+}
+.sup-card:hover {
+    transform: translateY(-2px);
+}
+
+.sup-card.status-充足 {
+    border-left: 3px solid var(--accent-green);
+}
+.sup-card.status-偏低 {
+    border-left: 3px solid var(--accent-orange);
+}
+.sup-card.status-告急 {
+    border-left: 3px solid var(--accent-red);
+    animation: shake 0.5s infinite;
+}
+
+@keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-3px); }
+    75% { transform: translateX(3px); }
+}
+
+.sup-card h4 {
+    font-size: 16px;
+    margin-bottom: 12px;
+}
+
+.sup-card .meta {
+    font-size: 13px;
+    color: var(--text-secondary);
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+/* Progress Bar */
+.progress-track {
+    width: 100%;
+    height: 8px;
+    background: rgba(255,255,255,0.06);
+    border-radius: 4px;
+    overflow: hidden;
+    margin: 12px 0;
+}
+.progress-fill {
+    height: 100%;
+    border-radius: 4px;
+    transition: width 0.5s ease;
+}
+.progress-fill.green { background: var(--accent-green); }
+.progress-fill.orange { background: var(--accent-orange); }
+.progress-fill.red { background: var(--accent-red); }
+
+.days-label {
+    font-size: 12px;
+    color: var(--text-secondary);
+    text-align: right;
+    margin-bottom: 12px;
+}
+
+.card-actions {
+    display: flex;
+    gap: 8px;
+}
+.card-actions button {
+    flex: 1;
+    padding: 6px 0;
+    border-radius: 6px;
+    font-size: 12px;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-primary);
+    transition: background 0.2s;
+}
+.card-actions .edit-btn:hover {
+    background: rgba(33,150,243,0.12);
+    border-color: var(--accent-blue);
+}
+.card-actions .del-btn:hover {
+    background: rgba(244,67,54,0.12);
+    border-color: var(--accent-red);
+}
+
+/* ---- Modal ---- */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+.modal-box {
+    background: #1E1E1E;
+    border-radius: 12px;
+    padding: 28px;
+    width: 400px;
+    border: 1px solid var(--border);
+}
+.modal-box h3 {
+    font-size: 16px;
+    margin-bottom: 20px;
+}
+.modal-box label {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 12px;
+    color: var(--text-secondary);
+    margin-bottom: 16px;
+}
+.modal-box input {
+    background: #2A2A2A;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 8px 12px;
+    color: var(--text-primary);
+    font-size: 14px;
+    outline: none;
+}
+.modal-box input:focus {
+    border-color: var(--accent-blue);
+}
+.modal-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 12px;
+    margin-top: 8px;
+}

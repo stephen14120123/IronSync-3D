@@ -1,0 +1,150 @@
+.page-container {
+    padding: 80px 32px 32px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* ---- Terminal-style Search ---- */
+.search-area {
+    display: flex;
+    align-items: center;
+    background: #0D0D0D;
+    border: 1px solid #333;
+    border-radius: 8px;
+    padding: 12px 18px;
+    font-family: "Fira Code", "Cascadia Code", "Consolas", monospace;
+    transition: border-color 0.2s;
+}
+.search-area:focus-within {
+    border-color: var(--accent-blue);
+    box-shadow: 0 0 12px rgba(33,150,243,0.15);
+}
+
+.search-prefix {
+    color: var(--accent-green);
+    font-size: 15px;
+    margin-right: 12px;
+    white-space: nowrap;
+}
+
+#searchInput {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text-primary);
+    font-family: inherit;
+    font-size: 15px;
+}
+#searchInput::placeholder {
+    color: #555;
+}
+
+/* ---- Main Grid ---- */
+.main-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+    flex: 1;
+    min-height: 0;
+}
+
+.results-panel, .preview-panel {
+    background: var(--bg-card);
+    border-radius: var(--radius);
+    border: 1px solid var(--border);
+    padding: 16px;
+    overflow-y: auto;
+}
+
+.placeholder {
+    color: #555;
+    text-align: center;
+    padding: 60px 0;
+    font-size: 14px;
+}
+
+/* ---- Result Items ---- */
+.result-item {
+    padding: 14px 16px;
+    border-radius: 8px;
+    border: 1px solid var(--border);
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: background 0.2s, border-color 0.2s;
+}
+.result-item:hover {
+    background: rgba(255,255,255,0.03);
+    border-color: var(--accent-blue);
+}
+.result-item .file-path {
+    font-size: 11px;
+    color: #666;
+    font-family: monospace;
+    margin-bottom: 4px;
+}
+.result-item .title {
+    font-size: 15px;
+    font-weight: 600;
+    margin-bottom: 6px;
+    color: var(--text-primary);
+}
+.result-item .snippet {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    white-space: pre-wrap;
+    word-break: break-all;
+}
+.result-item .snippet mark {
+    background: rgba(33,150,243,0.25);
+    color: var(--accent-blue);
+    padding: 0 2px;
+    border-radius: 2px;
+}
+
+/* ---- Preview Panel ---- */
+.preview-panel {
+    font-size: 14px;
+    line-height: 1.7;
+    color: var(--text-primary);
+}
+.preview-panel h1, .preview-panel h2, .preview-panel h3 {
+    margin: 16px 0 8px;
+    color: var(--text-primary);
+}
+.preview-panel h1 { font-size: 22px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
+.preview-panel h2 { font-size: 18px; }
+.preview-panel h3 { font-size: 15px; }
+.preview-panel p { margin: 8px 0; }
+.preview-panel code {
+    background: #2A2A2A;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-size: 13px;
+    font-family: "Fira Code", monospace;
+}
+.preview-panel pre {
+    background: #0D0D0D;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 16px;
+    overflow-x: auto;
+}
+.preview-panel pre code {
+    background: transparent;
+    padding: 0;
+}
+.preview-panel ul, .preview-panel ol {
+    padding-left: 24px;
+    margin: 8px 0;
+}
+.preview-panel blockquote {
+    border-left: 3px solid var(--accent-blue);
+    padding-left: 12px;
+    color: var(--text-secondary);
+    margin: 8px 0;
+}

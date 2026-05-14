@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MCP 日记检索 — IronSync-3D</title>
+    <link rel="stylesheet" href="css/global.css">
+    <link rel="stylesheet" href="css/mcp-search.css">
+</head>
+<body>
+    <div id="top-bar">
+        <div class="logo">IRON<span>SYNC</span> 3D</div>
+        <nav>
+            <a href="/">仪表盘</a>
+            <a href="/training.html">训练记录</a>
+            <a href="/supplements.html">补剂管家</a>
+            <a href="/diet-mood.html">饮食情绪</a>
+            <a href="/body-metrics.html">身体指标</a>
+            <a href="/mcp-search.html" class="active">日记检索</a>
+            <a href="/test-report.html">测试报告</a>
+        </nav>
+    </div>
+
+    <div class="page-container">
+        <div class="search-area">
+            <span class="search-prefix">$ search&gt;</span>
+            <input type="text" id="searchInput" placeholder="输入关键词搜索本地 Markdown 笔记...">
+        </div>
+
+        <div class="main-grid">
+            <div class="results-panel" id="resultsPanel">
+                <div class="placeholder">输入关键词开始检索</div>
+            </div>
+            <div class="preview-panel" id="previewPanel">
+                <div class="placeholder">选择一条结果查看内容</div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/mcp-search.js"></script>
+</body>
+</html>
