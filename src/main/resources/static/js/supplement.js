@@ -1,6 +1,7 @@
 let allSupplements = [];
 let statusData = [];
 let editingId = null;
+let supplementChart = null;
 
 const $ = id => document.getElementById(id);
 const modal = $('modal');
@@ -47,6 +48,62 @@ function renderCards(list) {
     );
 }
 
+// ---- Supplement Horizontal Bar Chart ----
+const STATUS_COLOR_MAP = { '告急': '#F44336', '偏低': '#FF9800', '充足': '#4CAF50' };
+
+function initSupplementChart() {
+    const dom = document.getElementById('supplementChart');
+    if (!dom) return;
+    supplementChart = echarts.init(dom);
+    window.addEventListener('resize', () => supplementChart && supplementChart.resize());
+}
+
+function renderSupplementChart(list) {
+    if (!supplementChart || !list.length) return;
+    const sorted = [...list].sort((a, b) => b.currentStockG - a.currentStockG);
+
+    supplementChart.setOption({
+        tooltip: {
+            trigger: 'axis',
+            axisPointer: { type: 'shadow' },
+            backgroundColor: 'rgba(30,30,30,0.9)',
+            borderColor: 'rgba(255,255,255,0.08)',
+            textStyle: { color: '#E0E0E0', fontSize: 12 },
+            valueFormatter: (v) => v + ' g'
+        },
+        grid: { left: 100, right: 40, top: 10, bottom: 10 },
+        xAxis: {
+            type: 'value',
+            name: '库存 (g)',
+            nameTextStyle: { color: '#9E9E9E', fontSize: 11 },
+            axisLabel: { color: '#9E9E9E' },
+            splitLine: { lineStyle: { color: 'rgba(255,255,255,0.04)' } }
+        },
+        yAxis: {
+            type: 'category',
+            data: sorted.map(s => s.name),
+            axisLabel: { color: '#E0E0E0', fontSize: 12 },
+            axisLine: { lineStyle: { color: 'rgba(255,255,255,0.08)' } }
+        },
+        series: [{
+            type: 'bar',
+            barWidth: '60%',
+            label: {
+                show: true,
+                position: 'right',
+                color: '#9E9E9E',
+                fontSize: 11,
+                formatter: (p) => p.value + ' g'
+            },
+            data: sorted.map(s => ({
+                value: s.currentStockG,
+                itemStyle: { color: STATUS_COLOR_MAP[s.status] || '#2196F3' }
+            }))
+        }],
+        backgroundColor: 'transparent'
+    }, true);
+}
+
 function mergeStatus() {
     const map = {};
     statusData.forEach(s => { map[s.id] = s; });
@@ -70,6 +127,7 @@ async function loadData() {
         statusData = [];
     }
     applyFilter();
+    renderSupplementChart(allSupplements);
 }
 
 function applyFilter() {
@@ -146,4 +204,5 @@ $('addBtn').addEventListener('click', openAdd);
 $('searchInput').addEventListener('input', applyFilter);
 
 // ---- Init ----
+initSupplementChart();
 loadData();

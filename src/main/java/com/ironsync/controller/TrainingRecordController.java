@@ -5,6 +5,7 @@ import com.ironsync.common.result.Result;
 import com.ironsync.dto.request.TrainingRecordCreateDTO;
 import com.ironsync.dto.request.TrainingRecordUpdateDTO;
 import com.ironsync.dto.response.TrainingRecordVO;
+import com.ironsync.dto.response.WeeklyVolumeVO;
 import com.ironsync.service.TrainingRecordService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -86,5 +87,12 @@ public class TrainingRecordController {
     @GetMapping("/today")
     public Result<List<TrainingRecordVO>> today() {
         return Result.success(trainingRecordService.findByDate(LocalDate.now()));
+    }
+
+    @Operation(summary = "获取周训练容量", description = "最近 4 周的每周总训练容量柱状图数据")
+    @ApiResponse(responseCode = "200", description = "成功返回每周训练容量列表")
+    @GetMapping("/weekly-volume")
+    public Result<List<WeeklyVolumeVO>> weeklyVolume() {
+        return Result.success(trainingRecordService.getWeeklyVolume());
     }
 }

@@ -1,9 +1,10 @@
 import { test, expect } from '@playwright/test';
+import { gotoWithAuth } from '../helpers/auth-helper';
 
 test.describe('Dashboard 3D Scene', () => {
 
     test('should load the 3D scene canvas', async ({ page }) => {
-        await page.goto('/');
+        await gotoWithAuth(page, '/');
         await expect(page).toHaveTitle(/IronSync-3D/);
 
         // Wait for Three.js to render the canvas
@@ -12,7 +13,7 @@ test.describe('Dashboard 3D Scene', () => {
     });
 
     test('should not show 3D loading failure', async ({ page }) => {
-        await page.goto('/');
+        await gotoWithAuth(page, '/');
 
         // Wait for canvas or hint to appear
         await page.waitForSelector('#three-canvas-container canvas, #hint-overlay', {
@@ -24,8 +25,8 @@ test.describe('Dashboard 3D Scene', () => {
         await expect(hint).not.toContainText(/失败/);
     });
 
-    test('should display training stats from today\\'s data', async ({ page }) => {
-        await page.goto('/');
+    test('should display training stats from today\'s data', async ({ page }) => {
+        await gotoWithAuth(page, '/');
 
         // Wait for API data to load (the seed data includes a today training record)
         await page.waitForResponse(
@@ -47,14 +48,14 @@ test.describe('Dashboard 3D Scene', () => {
     });
 
     test('should display fixed calorie target', async ({ page }) => {
-        await page.goto('/');
+        await gotoWithAuth(page, '/');
 
         await page.waitForSelector('#cal-target', { timeout: 10000 });
         await expect(page.locator('#cal-target')).toHaveText('600 kcal');
     });
 
     test('should navigate to training page via nav bar', async ({ page }) => {
-        await page.goto('/');
+        await gotoWithAuth(page, '/');
 
         // Click training link in navigation
         await page.click('nav a[href="/training.html"]');

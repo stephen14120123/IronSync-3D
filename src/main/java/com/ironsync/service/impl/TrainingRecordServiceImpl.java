@@ -9,6 +9,7 @@ import com.ironsync.common.exception.BusinessException;
 import com.ironsync.dto.request.TrainingRecordCreateDTO;
 import com.ironsync.dto.request.TrainingRecordUpdateDTO;
 import com.ironsync.dto.response.TrainingRecordVO;
+import com.ironsync.dto.response.WeeklyVolumeVO;
 import com.ironsync.entity.TrainingRecord;
 import com.ironsync.mapper.TrainingRecordMapper;
 import com.ironsync.service.TrainingRecordService;
@@ -16,9 +17,15 @@ import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.math.BigDecimal;
+import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.temporal.TemporalAdjusters;
+import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -107,6 +114,54 @@ public class TrainingRecordServiceImpl implements TrainingRecordService {
         List<TrainingRecord> list = trainingRecordMapper.selectAll(1L);
         if (list == null || list.isEmpty()) return Collections.emptyList();
         return list.stream().map(this::toVO).collect(Collectors.toList());
+    }
+
+    @Override
+    public BigDecimal calculateTodayCalories() {
+        List<TrainingRecord> todayRecords = trainingRecordMapper.selectByRecordDate(LocalDate.now());
+        if (todayRecords == null || todayRecords.isEmpty()) {
+            return BigDecimal.ZERO;
+        }
+        // 简化经验公式：总热量 (kcal) = sum(重量kg * 组数 * 次数) * 0.1
+        BigDecimal totalVolume = todayRecords.stream()
+                .map(r -> r.getWeightKg().multiply(BigDecimal.valueOf(r.getSets()))
+                        .multiply(BigDecimal.valueOf(r.getReps())))
+                .reduce(BigDecimal.ZERO, BigDecimal::add);
+        return totalVolume.multiply(BigDecimal.valueOf(0.1)).setScale(0, java.math.RoundingMode.HALF_UP);
+    }
+
+    @Override
+    public List<WeeklyVolumeVO> getWeeklyVolume() {
+        LocalDate now = LocalDate.now();
+        // 最近 4 周，从当前周周一开始
+        List<TrainingRecord> allRecords = trainingRecordMapper.selectAll(1L);
+        if (allRecords == null || allRecords.isEmpty()) return Collections.emptyList();
+
+        Map<String, BigDecimal> weekMap = new LinkedHashMap<>();
+        for (int i = 3; i >= 0; i--) {
+            LocalDate weekStart = now.minusWeeks(i).with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+            weekMap.put(weekStart.toString(), BigDecimal.ZERO);
+        }
+
+        for (TrainingRecord r : allRecords) {
+            LocalDate weekStart = r.getRecordDate().with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
+            String key = weekStart.toString();
+            if (weekMap.containsKey(key)) {
+                BigDecimal volume = r.getWeightKg()
+                        .multiply(BigDecimal.valueOf(r.getSets()))
+                        .multiply(BigDecimal.valueOf(r.getReps()));
+                weekMap.merge(key, volume, BigDecimal::add);
+            }
+        }
+
+        List<WeeklyVolumeVO> result = new ArrayList<>();
+        for (Map.Entry<String, BigDecimal> entry : weekMap.entrySet()) {
+            result.add(WeeklyVolumeVO.builder()
+                    .weekStart(entry.getKey())
+                    .volume(entry.getValue())
+                    .build());
+        }
+        return result;
     }
 
     private TrainingRecordVO toVO(TrainingRecord entity) {

@@ -17,12 +17,12 @@ ironsync:
   mesh:
     mappings:
       - action: 杠铃深蹲
-        meshes: [LeftLeg, RightLeg, LowerBack]
+        meshes: [Quad_L, Quad_R, Glute_L, Glute_R]
       - action: 罗马尼亚硬拉
-        meshes: [LowerBack, LeftLeg, RightLeg]
+        meshes: [Hamstring_L, Hamstring_R, LowerBack]
       - action: 卧推
-        meshes: [Chest, LeftArm, RightArm]
+        meshes: [Pectoral_M_L, Pectoral_M_R, Tricep_L, Tricep_R]
       - action: 推举
-        meshes: [LeftArm, RightArm, Torso]
+        meshes: [Deltoid_A_L, Deltoid_A_R, Tricep_L, Tricep_R]
       - action: 引体向上
-        meshes: [LeftArm, RightArm, Torso]
+        meshes: [Lat_Dorsi_L, Lat_Dorsi_R, Bicep_L, Bicep_R]

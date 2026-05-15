@@ -1,5 +1,17 @@
 const API_BASE = 'http://localhost:8080/api';
 
+// ---- Auth helpers ----
+function getAuthToken() {
+    return localStorage.getItem('auth_token');
+}
+
+function redirectToLogin() {
+    localStorage.removeItem('auth_token');
+    if (!window.location.pathname.endsWith('login.html')) {
+        window.location.href = '/login.html';
+    }
+}
+
 // ---- Toast 通知系统 ----
 function showToast(message, type) {
     const existing = document.querySelector('.toast-container');
@@ -36,19 +48,24 @@ function showToast(message, type) {
 const api = {
     async request(method, path, body) {
         const url = API_BASE + path;
-        const options = {
-            method,
-            headers: { 'Content-Type': 'application/json' }
-        };
+        const headers = { 'Content-Type': 'application/json' };
+        const token = getAuthToken();
+        if (token) {
+            headers['Authorization'] = 'Bearer ' + token;
+        }
+        const options = { method, headers };
         if (body !== undefined) {
             options.body = JSON.stringify(body);
         }
         try {
             const res = await fetch(url, options);
+            if (res.status === 401) {
+                redirectToLogin();
+                throw new Error('未登录或 Token 已失效');
+            }
             const json = await res.json();
             if (json.code !== 200) {
                 const msg = json.message || '请求失败';
-                const detail = json.data ? '\n' + JSON.stringify(json.data) : '';
                 showToast('请求错误: ' + msg, 'error');
                 throw new Error(msg);
             }
@@ -66,3 +83,16 @@ const api = {
     put(path, body)  { return this.request('PUT', path, body); },
     del(path)  { return this.request('DELETE', path); }
 };
+
+// ---- Auth guard: redirect unauthenticated users to login ----
+(function () {
+    const path = window.location.pathname;
+    const isLoginPage = path.endsWith('login.html');
+    const isTestReport = path.startsWith('/test-reports');
+    const isStaticAsset = path.match(/\.(css|js|png|jpg|svg|ico|glb)$/);
+    if (isLoginPage || isTestReport || isStaticAsset) return;
+
+    if (!getAuthToken()) {
+        window.location.href = '/login.html';
+    }
+})();

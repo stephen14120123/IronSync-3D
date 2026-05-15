@@ -4,8 +4,10 @@ import com.github.pagehelper.PageInfo;
 import com.ironsync.dto.request.TrainingRecordCreateDTO;
 import com.ironsync.dto.request.TrainingRecordUpdateDTO;
 import com.ironsync.dto.response.TrainingRecordVO;
+import com.ironsync.dto.response.WeeklyVolumeVO;
 import com.ironsync.entity.TrainingRecord;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.List;
 
@@ -28,4 +30,8 @@ public interface TrainingRecordService {
     PageInfo<TrainingRecordVO> findAll(int page, int size);
 
     List<TrainingRecordVO> findAllForChart();
+
+    BigDecimal calculateTodayCalories();
+
+    List<WeeklyVolumeVO> getWeeklyVolume();
 }

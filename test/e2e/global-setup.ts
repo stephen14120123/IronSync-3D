@@ -9,23 +9,50 @@ const BASE_URL = process.env.BASE_URL || 'http://localhost:8080';
  * This ensures each `npx playwright test` run starts from a clean slate.
  */
 async function globalSetup(_config: FullConfig) {
-    const url = `${BASE_URL}/api/test/db-reset`;
+    const loginUrl = `${BASE_URL}/api/auth/login`;
+    const resetUrl = `${BASE_URL}/api/test/db-reset`;
 
-    console.log(`\n[globalSetup] Resetting database via ${url} ...`);
+    // Step 1: Login to get a token
+    console.log(`\n[globalSetup] Logging in as admin...`);
+    const loginRes = await fetch(loginUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ username: 'admin', password: '123456' }),
+    });
 
-    const response = await fetch(url, { method: 'POST' });
+    if (!loginRes.ok) {
+        const body = await loginRes.text();
+        throw new Error(`[globalSetup] Login failed (${loginRes.status}): ${body}`);
+    }
 
-    if (!response.ok) {
-        const body = await response.text();
+    const loginJson: any = await loginRes.json();
+    if (loginJson.code !== 200) {
+        throw new Error(`[globalSetup] Login returned error: ${loginJson.message}`);
+    }
+
+    const token: string = loginJson.data.token;
+
+    // Step 2: Call db-reset with the token
+    console.log(`[globalSetup] Resetting database via ${resetUrl} ...`);
+    const resetRes = await fetch(resetUrl, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${token}`,
+        },
+    });
+
+    if (!resetRes.ok) {
+        const body = await resetRes.text();
         throw new Error(
-            `[globalSetup] DB reset failed (${response.status}): ${body}\n` +
+            `[globalSetup] DB reset failed (${resetRes.status}): ${body}\n` +
             `Make sure the Spring Boot app is running with --spring.profiles.active=dev`
         );
     }
 
-    const json = await response.json();
-    if (json.code !== 200) {
-        throw new Error(`[globalSetup] DB reset returned error: ${json.message}`);
+    const resetJson = await resetRes.json();
+    if (resetJson.code !== 200) {
+        throw new Error(`[globalSetup] DB reset returned error: ${resetJson.message}`);
     }
 
     console.log('[globalSetup] Database reset complete.');

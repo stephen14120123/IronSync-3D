@@ -1,4 +1,5 @@
 let chart = null;
+let volumeChart = null;
 let allRecords = [];
 let currentPage = 1;
 let pageSize = 10;
@@ -11,6 +12,11 @@ function initChart() {
     window.addEventListener('resize', () => chart && chart.resize());
 }
 
+// Epley formula: 1RM = Weight * (1 + Reps / 30)
+function epley1rm(weight, reps) {
+    return weight * (1 + reps / 30);
+}
+
 function renderChart(records) {
     if (!chart) return;
 
@@ -18,7 +24,8 @@ function renderChart(records) {
     const map = {};
     for (const r of records) {
         if (!map[r.actionName]) map[r.actionName] = [];
-        map[r.actionName].push({ date: r.recordDate, weight: r.weightKg });
+        const est1rm = epley1rm(r.weightKg, r.reps);
+        map[r.actionName].push({ date: r.recordDate, est1rm });
     }
 
     const colors = ['#F44336', '#2196F3', '#4CAF50', '#FF9800', '#9C27B0'];
@@ -35,7 +42,7 @@ function renderChart(records) {
             symbolSize: 6,
             lineStyle: { width: 2 },
             itemStyle: { color },
-            data: pts.map(p => [p.date, p.weight])
+            data: pts.map(p => [p.date, p.est1rm])
         };
     });
 
@@ -46,7 +53,8 @@ function renderChart(records) {
             trigger: 'axis',
             backgroundColor: 'rgba(30,30,30,0.9)',
             borderColor: 'rgba(255,255,255,0.08)',
-            textStyle: { color: '#E0E0E0', fontSize: 12 }
+            textStyle: { color: '#E0E0E0', fontSize: 12 },
+            valueFormatter: (v) => v.toFixed(1) + ' kg'
         },
         legend: {
             data: actionNames,
@@ -62,7 +70,7 @@ function renderChart(records) {
         },
         yAxis: {
             type: 'value',
-            name: '重量 (kg)',
+            name: '1RM 估算值 (kg)',
             nameTextStyle: { color: '#9E9E9E', fontSize: 11 },
             axisLabel: { color: '#9E9E9E' },
             splitLine: { lineStyle: { color: 'rgba(255,255,255,0.04)' } }
@@ -181,6 +189,68 @@ document.getElementById('trainingForm').addEventListener('submit', async e => {
     } catch (_) {}
 });
 
+// ---- Weekly Volume Bar Chart ----
+function initVolumeChart() {
+    const dom = document.getElementById('volumeChart');
+    if (!dom) return;
+    volumeChart = echarts.init(dom);
+    window.addEventListener('resize', () => volumeChart && volumeChart.resize());
+}
+
+function renderVolumeChart(data) {
+    if (!volumeChart || !data || !data.length) return;
+    const weeks = data.map(d => d.weekStart);
+    const values = data.map(d => d.volume);
+    const maxVal = Math.max(...values, 1);
+
+    volumeChart.setOption({
+        tooltip: {
+            trigger: 'axis',
+            backgroundColor: 'rgba(30,30,30,0.9)',
+            borderColor: 'rgba(255,255,255,0.08)',
+            textStyle: { color: '#E0E0E0', fontSize: 12 },
+            valueFormatter: (v) => v.toLocaleString() + ' kg'
+        },
+        grid: { left: 60, right: 24, top: 30, bottom: 30 },
+        xAxis: {
+            type: 'category',
+            data: weeks,
+            axisLabel: { color: '#9E9E9E', fontSize: 11 },
+            axisLine: { lineStyle: { color: 'rgba(255,255,255,0.08)' } }
+        },
+        yAxis: {
+            type: 'value',
+            name: '训练容量 (kg)',
+            nameTextStyle: { color: '#9E9E9E', fontSize: 11 },
+            axisLabel: { color: '#9E9E9E' },
+            splitLine: { lineStyle: { color: 'rgba(255,255,255,0.04)' } }
+        },
+        series: [{
+            type: 'bar',
+            data: values.map(v => ({
+                value: v,
+                itemStyle: {
+                    color: v >= maxVal * 0.8 ? '#F44336'
+                         : v >= maxVal * 0.5 ? '#FF9800'
+                         : '#2196F3'
+                }
+            })),
+            barWidth: '50%',
+            itemStyle: { borderRadius: [4, 4, 0, 0] }
+        }],
+        backgroundColor: 'transparent'
+    }, true);
+}
+
+async function loadVolumeChart() {
+    try {
+        const data = await api.get('/training-records/weekly-volume') || [];
+        renderVolumeChart(data);
+    } catch (_) {}
+}
+
 initChart();
+initVolumeChart();
 loadTable();
 loadChart();
+loadVolumeChart();

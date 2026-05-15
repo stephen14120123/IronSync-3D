@@ -1,10 +1,11 @@
 import { test, expect } from '@playwright/test';
+import { gotoWithAuth } from '../helpers/auth-helper';
 import { waitForSuccessToast } from '../helpers/toast-helper';
 
 test.describe('Supplement Management', () => {
 
     test.beforeEach(async ({ page }) => {
-        await page.goto('/supplements.html');
+        await gotoWithAuth(page, '/supplements.html');
         await expect(page).toHaveTitle(/补剂管家/);
     });
 

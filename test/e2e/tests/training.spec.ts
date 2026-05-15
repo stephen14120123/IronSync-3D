@@ -1,10 +1,11 @@
 import { test, expect } from '@playwright/test';
+import { gotoWithAuth } from '../helpers/auth-helper';
 import { waitForSuccessToast } from '../helpers/toast-helper';
 
 test.describe('Training Record CRUD', () => {
 
     test.beforeEach(async ({ page }) => {
-        await page.goto('/training.html');
+        await gotoWithAuth(page, '/training.html');
         await expect(page).toHaveTitle(/核心训练记录/);
     });
 

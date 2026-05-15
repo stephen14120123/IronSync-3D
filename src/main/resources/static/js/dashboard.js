@@ -28,102 +28,150 @@ controls.autoRotate = true;
 controls.autoRotateSpeed = 1.0;
 controls.update();
 
-// ---- Lights ----
-const ambient = new THREE.AmbientLight(0xffffff, 0.6);
-scene.add(ambient);
+// ---- Enhanced Lighting for Anatomical Detail ----
+// HemisphereLight: soft ambient from sky/ground — reveals overall form
+const hemiLight = new THREE.HemisphereLight(0x87CEEB, 0x3a3a3a, 0.8);
+scene.add(hemiLight);
 
-const mainLight = new THREE.DirectionalLight(0xffffff, 1.2);
-mainLight.position.set(5, 10, 7);
-mainLight.castShadow = true;
-scene.add(mainLight);
+// Warm key light from upper-right — main muscle contour definition
+const keyLight = new THREE.DirectionalLight(0xffeedd, 1.5);
+keyLight.position.set(5, 8, 5);
+keyLight.castShadow = true;
+keyLight.shadow.mapSize.width = 2048;
+keyLight.shadow.mapSize.height = 2048;
+scene.add(keyLight);
 
-const fillLight = new THREE.DirectionalLight(0x8888ff, 0.4);
-fillLight.position.set(-5, 0, 5);
+// Cool fill light from left-back — reduces harsh shadows
+const fillLight = new THREE.DirectionalLight(0x8888ff, 0.5);
+fillLight.position.set(-4, 2, -3);
 scene.add(fillLight);
+
+// Rim light from behind — creates edge definition and depth separation
+const rimLight = new THREE.DirectionalLight(0xffffff, 0.4);
+rimLight.position.set(0, 4, -6);
+scene.add(rimLight);
 
 // ---- Ground grid ----
 const grid = new THREE.GridHelper(8, 12, 0x333333, 0x222222);
 grid.position.y = -0.5;
 scene.add(grid);
 
-// ---- Model Node Name Mapping ----
-// Canonical names (returned by backend) → actual GLTF mesh name aliases.
-// Adjust when using a different .glb model.
-const CANONICAL_TO_MODEL = {
-    LeftLeg:   ['LeftLeg', 'left_leg', 'Leg_Left', 'Left_Leg', 'UpperLeg_Left', 'LowerLeg_Left', 'Left Leg'],
-    RightLeg:  ['RightLeg', 'right_leg', 'Leg_Right', 'Right_Leg', 'UpperLeg_Right', 'LowerLeg_Right', 'Right Leg'],
-    LowerBack: ['LowerBack', 'lower_back', 'Hips', 'Spine', 'Waist', 'Hip_Reference'],
-    Chest:     ['Chest', 'chest', 'Chest_Reference', 'UpperBody', 'Torso_Reference'],
-    LeftArm:   ['LeftArm', 'left_arm', 'Arm_Left', 'Left_Arm', 'UpperArm_Left', 'LowerArm_Left', 'Left Arm'],
-    RightArm:  ['RightArm', 'right_arm', 'Arm_Right', 'Right_Arm', 'UpperArm_Right', 'LowerArm_Right', 'Right Arm'],
-    Head:      ['Head', 'head', 'Head_Reference'],
-    Torso:     ['Torso', 'torso', 'Body', 'Spine1', 'Spine2', 'Body_Reference'],
-};
+// ---- Highlight Helpers ----
+const highlightedMeshes = [];
 
-const bodyParts = {};
-
-// ---- Material Helpers ----
-function cloneMaterialToHighlight(mat) {
-    const clone = mat.clone();
-    clone.color.setHSL(0, 0.8, 0.4);
-    clone.emissive = new THREE.Color(0xFF2A2A);
-    clone.emissiveIntensity = 0.6;
-    return clone;
-}
-
-function applyHighlight(mesh) {
+function highlightMesh(mesh, color, emissive) {
     if (mesh.__highlighted) return;
     mesh.__originalMat = mesh.material;
-    if (Array.isArray(mesh.material)) {
-        mesh.material = mesh.material.map(cloneMaterialToHighlight);
-    } else {
-        mesh.material = cloneMaterialToHighlight(mesh.material);
-    }
+    const matClone = mesh.material.clone();
+    matClone.color.setHSL(color.h, color.s, color.l);
+    matClone.emissive = emissive.clone();
+    matClone.emissiveIntensity = 0.6;
+    mesh.material = matClone;
     mesh.__highlighted = true;
+    highlightedMeshes.push(mesh);
 }
 
 function resetHighlights() {
-    for (const name in bodyParts) {
-        const mesh = bodyParts[name];
-        if (mesh.__highlighted && mesh.__originalMat) {
+    highlightedMeshes.forEach(mesh => {
+        if (mesh.__originalMat) {
             mesh.material = mesh.__originalMat;
             delete mesh.__originalMat;
-            mesh.__highlighted = false;
+            delete mesh.__highlighted;
         }
-    }
+    });
+    highlightedMeshes.length = 0;
 }
 
+/**
+ * Highlight specified muscle groups on the loaded 3D model.
+ * Uses fuzzy matching (child.name.includes(name)) to support various
+ * modeling conventions — compatible with any GLTF model whose meshes
+ * follow anatomical naming patterns.
+ *
+ * @param {string[]} meshNameArray - Array of mesh name fragments to match
+ * @param {object} [color] - Optional HSL color spec {h, s, l}. Defaults to warm red.
+ * @returns {number} Number of meshes highlighted
+ */
+function highlightMuscleGroups(meshNameArray, color) {
+    if (!meshNameArray || !meshNameArray.length) return 0;
+
+    const hsl = color || { h: 0, s: 0.8, l: 0.4 };
+    const emissive = new THREE.Color().setHSL(hsl.h, hsl.s, hsl.l);
+
+    const sceneNodes = [];
+    scene.traverse((child) => { if (child.isMesh) sceneNodes.push(child); });
+
+    let count = 0;
+    for (const name of meshNameArray) {
+        let found = false;
+        for (const node of sceneNodes) {
+            if (node.name.includes(name)) {
+                highlightMesh(node, hsl, emissive);
+                count++;
+                found = true;
+            }
+        }
+        // Fallback: procedural robot uses bodyParts keyed by canonical names
+        if (!found) {
+            const fallbackKey = ANATOMICAL_TO_FALLBACK[name];
+            if (fallbackKey && bodyParts[fallbackKey]) {
+                highlightMesh(bodyParts[fallbackKey], hsl, emissive);
+                count++;
+            }
+        }
+    }
+    return count;
+}
+
+// ---- Fallback mapping: anatomical → procedural robot body parts ----
+const ANATOMICAL_TO_FALLBACK = {
+    'Quad_L': 'LeftLeg', 'Quad_R': 'RightLeg',
+    'Glute_L': 'LeftLeg', 'Glute_R': 'RightLeg',
+    'Hamstring_L': 'LeftLeg', 'Hamstring_R': 'RightLeg',
+    'LowerBack': 'LowerBack',
+    'Pectoral_M_L': 'Chest', 'Pectoral_M_R': 'Chest',
+    'Tricep_L': 'LeftArm', 'Tricep_R': 'RightArm',
+    'Bicep_L': 'LeftArm', 'Bicep_R': 'RightArm',
+    'Deltoid_A_L': 'LeftArm', 'Deltoid_A_R': 'RightArm',
+    'Lat_Dorsi_L': 'Torso', 'Lat_Dorsi_R': 'Torso',
+    'Trapezius': 'Torso',
+    'Abdominal': 'Torso',
+};
+
 // ---- GLTF Model Loading ----
+// ═══════════════════════════════════════════════════════════════════
+//  TO REPLACE WITH HIGH-QUALITY HUMAN ANATOMY MODEL:
+//   1. Download a human muscle anatomy GLB (e.g. from Sketchfab)
+//   2. Place it in  src/main/resources/static/models/
+//   3. Update MODEL_PATH below to point to the new file
+//   4. Ensure mesh naming aligns with ironsync.mesh.mappings
+//      in application-dev.yml (see model requirements above)
+// ═══════════════════════════════════════════════════════════════════
+const MODEL_PATH = '/static/models/RobotExpressive.glb';
+const bodyParts = {};
+
 function loadModel() {
     const loader = new GLTFLoader();
     updateHint('正在加载 3D 场景...');
 
     loader.load(
-        '/static/models/RobotExpressive.glb',
+        MODEL_PATH,
         (gltf) => {
             const model = gltf.scene;
             model.scale.set(2.5, 2.5, 2.5);
             model.position.set(0, -0.3, 0);
             scene.add(model);
 
-            // Build bodyParts index: match model mesh names through CANONICAL_TO_MODEL
+            // Log all mesh names for debugging anatomical matching
             const foundNodes = [];
             model.traverse((node) => {
-                if (node.isMesh) {
-                    foundNodes.push(node.name);
-                    for (const [canonical, aliases] of Object.entries(CANONICAL_TO_MODEL)) {
-                        if (aliases.includes(node.name)) {
-                            bodyParts[canonical] = node;
-                            break;
-                        }
-                    }
-                }
+                if (node.isMesh) foundNodes.push(node.name);
             });
             console.log('[GLTF] Mesh nodes found:', foundNodes);
-            console.log('[GLTF] Mapped body parts:', Object.keys(bodyParts));
 
             updateHint('3D 场景加载完成');
             loadTrainingData();
+            loadSummary();
         },
         (xhr) => {
             if (xhr.total > 0) {
@@ -136,6 +184,7 @@ function loadModel() {
             updateHint('3D 模型加载失败，使用备用渲染');
             buildFallbackRobot();
             loadTrainingData();
+            loadSummary();
         }
     );
 }
@@ -202,56 +251,57 @@ async function loadTrainingData() {
         const records = await api.get('/training-records/today');
         if (!records || records.length === 0) {
             updateHint('今日尚未记录训练，开始你的训练吧！');
-            updateStats([]);
             return;
         }
 
-        // Reset previous highlights before applying new ones
         resetHighlights();
 
-        // Call backend for mesh mapping (decoupled from frontend)
         const actions = records.map(r => r.actionName);
         const meshNames = await api.get('/mesh/highlight?actions=' + actions.join(','));
 
         if (!meshNames || meshNames.length === 0) {
             updateHint('今日训练动作未匹配到高亮部位');
-            updateStats(records);
             return;
         }
 
-        let highlightedCount = 0;
-        meshNames.forEach(name => {
-            const mesh = bodyParts[name];
-            if (mesh) {
-                applyHighlight(mesh);
-                highlightedCount++;
-            }
-        });
+        const count = highlightMuscleGroups(meshNames);
 
-        if (highlightedCount === 0) {
+        if (count === 0) {
             updateHint('模型部位与训练数据未匹配到对应节点');
         } else {
             updateHint('训练部位已高亮 — ' + meshNames.join(' · '));
         }
-
-        updateStats(records);
     } catch (e) {
         updateHint('无法加载今日训练数据');
     }
 }
 
-function updateStats(records) {
-    if (!records || records.length === 0) {
-        document.getElementById('stat-exercises').textContent = '--';
-        document.getElementById('stat-sets').textContent = '--';
-        document.getElementById('stat-rpe').textContent = '--';
-        return;
+// ---- Dashboard Summary (calories + stats) ----
+const RING_CIRCUMFERENCE = 314.16;
+
+async function loadSummary() {
+    try {
+        const summary = await api.get('/dashboard/summary');
+        if (!summary) return;
+
+        document.getElementById('stat-exercises').textContent = summary.exerciseCount ?? '--';
+        document.getElementById('stat-sets').textContent = summary.totalSets ?? '--';
+        document.getElementById('stat-rpe').textContent = summary.avgRpe != null ? summary.avgRpe : '--';
+
+        const calVal = summary.totalCalories ?? 0;
+        const targetVal = summary.targetCalories ?? 600;
+        const pct = targetVal > 0 ? Math.min(calVal / targetVal, 1) : 0;
+
+        document.getElementById('cal-current').textContent = calVal;
+        document.getElementById('cal-target').textContent = targetVal + ' kcal';
+
+        const ring = document.getElementById('cal-ring');
+        const offset = RING_CIRCUMFERENCE * (1 - pct);
+        ring.style.transition = 'stroke-dashoffset 0.8s ease-out';
+        ring.style.strokeDashoffset = offset;
+    } catch (e) {
+        // Keep default placeholder values
     }
-    const totalSets = records.reduce((s, r) => s + (r.sets || 0), 0);
-    const avgRpe = (records.reduce((s, r) => s + (r.rpe || 0), 0) / records.length).toFixed(1);
-    document.getElementById('stat-exercises').textContent = records.length;
-    document.getElementById('stat-sets').textContent = totalSets;
-    document.getElementById('stat-rpe').textContent = avgRpe;
 }
 
 function updateHint(msg) {
@@ -264,14 +314,11 @@ function animate() {
     requestAnimationFrame(animate);
 
     const pulse = 0.4 + 0.3 * Math.sin(Date.now() * 0.003);
-    for (const name in bodyParts) {
-        const mesh = bodyParts[name];
-        if (mesh.__highlighted) {
-            if (Array.isArray(mesh.material)) {
-                mesh.material.forEach(m => { m.emissiveIntensity = pulse; });
-            } else {
-                mesh.material.emissiveIntensity = pulse;
-            }
+    for (const mesh of highlightedMeshes) {
+        if (Array.isArray(mesh.material)) {
+            mesh.material.forEach(m => { m.emissiveIntensity = pulse; });
+        } else {
+            mesh.material.emissiveIntensity = pulse;
         }
     }
 
@@ -280,8 +327,8 @@ function animate() {
 }
 
 // ---- Entry Point ----
-// Start model loading (falls back to procedural geometry on error)
 loadModel();
+loadSummary();
 animate();
 
 // ---- Resize ----
@@ -290,4 +337,3 @@ window.addEventListener('resize', () => {
     camera.updateProjectionMatrix();
     renderer.setSize(window.innerWidth, window.innerHeight);
 });
-

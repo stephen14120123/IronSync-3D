@@ -6,6 +6,11 @@
     <title>营养与补剂管家 — IronSync-3D</title>
     <link rel="stylesheet" href="css/global.css">
     <link rel="stylesheet" href="css/supplement.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
+    <style>
+        #supplement-chart-container { margin-bottom: 20px; background: #1E1E1E; border-radius: 12px; padding: 16px; }
+        #supplementChart { width: 100%; height: 200px; }
+    </style>
 </head>
 <body>
     <div id="top-bar">
@@ -22,6 +27,9 @@
     </div>
 
     <div class="page-container">
+        <div id="supplement-chart-container">
+            <div id="supplementChart"></div>
+        </div>
         <div class="toolbar">
             <input type="text" id="searchInput" placeholder="搜索补剂名称..." class="search-box">
             <button id="addBtn" class="btn-primary">+ 新增补剂</button>

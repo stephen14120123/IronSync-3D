@@ -2,7 +2,7 @@
 set -e
 
 PROJECT_DIR="$(cd "$(dirname "$0")/.." && pwd)"
-JAR_NAME="IronSync-3D-1.0.0-SNAPSHOT.jar"
+JAR_NAME="ironsync-3d.jar"
 
 echo "=== IronSync-3D Build Script ==="
 echo "Project dir: ${PROJECT_DIR}"
@@ -39,9 +39,9 @@ if [ ! -f "target/${JAR_NAME}" ]; then
 fi
 
 echo "Step 3: Copy artifact to deploy/"
-cp "target/${JAR_NAME}" "deploy/ironsync-3d.jar"
+cp "target/${JAR_NAME}" "deploy/${JAR_NAME}"
 echo ""
 
 echo "=== Build Complete ==="
-echo "Artifact: deploy/ironsync-3d.jar"
-ls -lh "deploy/ironsync-3d.jar"
+echo "Artifact: deploy/${JAR_NAME}"
+ls -lh "deploy/${JAR_NAME}"

@@ -2,7 +2,7 @@
 setlocal enabledelayedexpansion
 
 set PROJECT_DIR=%~dp0..
-set JAR_NAME=IronSync-3D-1.0.0-SNAPSHOT.jar
+set JAR_NAME=ironsync-3d.jar
 
 echo === IronSync-3D Build Script ===
 echo Project dir: %PROJECT_DIR%
@@ -41,7 +41,7 @@ if not exist "target\%JAR_NAME%" (
 )
 
 echo Step 3: Copy artifact to deploy/
-copy /Y "target\%JAR_NAME%" "deploy\ironsync-3d.jar"
+copy /Y "target\%JAR_NAME%" "deploy\%JAR_NAME%"
 if %ERRORLEVEL% neq 0 (
     echo ERROR: Copy failed
     exit /b 1
