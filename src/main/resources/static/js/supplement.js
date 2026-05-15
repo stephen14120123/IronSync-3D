@@ -1,4 +1,5 @@
 let allSupplements = [];
+let statusData = [];
 let editingId = null;
 
 const $ = id => document.getElementById(id);
@@ -14,10 +15,9 @@ function renderCards(list) {
         return;
     }
     grid.innerHTML = list.map(s => {
-        const days = s.dailyConsumptionG > 0
-            ? Math.floor(s.currentStockG / s.dailyConsumptionG) : 0;
-        const pct = s.dailyConsumptionG > 0
-            ? Math.min(100, (s.currentStockG / (s.dailyConsumptionG * 60)) * 100) : 0;
+        const days = s.remainingDays !== undefined ? Math.floor(s.remainingDays) : 0;
+        const pct = s.remainingDays !== undefined
+            ? Math.min(100, (s.remainingDays / 60) * 100) : 0;
         const fillClass = s.status === '告急' ? 'red' : s.status === '偏低' ? 'orange' : 'green';
 
         return `
@@ -47,11 +47,28 @@ function renderCards(list) {
     );
 }
 
+function mergeStatus() {
+    const map = {};
+    statusData.forEach(s => { map[s.id] = s; });
+    allSupplements.forEach(s => {
+        const dyn = map[s.id];
+        if (dyn) {
+            s.status = dyn.status;
+            s.remainingDays = dyn.remainingDays;
+        }
+    });
+}
+
 // ---- CRUD ----
 async function loadData() {
     try {
         allSupplements = await api.get('/supplements') || [];
-    } catch (_) { allSupplements = []; }
+        statusData = await api.get('/supplements/status') || [];
+        mergeStatus();
+    } catch (_) {
+        allSupplements = [];
+        statusData = [];
+    }
     applyFilter();
 }
 

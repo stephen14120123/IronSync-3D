@@ -18,8 +18,8 @@
     </sql>
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO supplement (user_id, name, current_stock_g, daily_consumption_g, status, created_at)
-        VALUES (#{userId}, #{name}, #{currentStockG}, #{dailyConsumptionG}, #{status}, #{createdAt})
+        INSERT INTO supplement (user_id, name, current_stock_g, daily_consumption_g, created_at)
+        VALUES (#{userId}, #{name}, #{currentStockG}, #{dailyConsumptionG}, #{createdAt})
     </insert>
 
     <select id="selectById" resultMap="BaseResultMap">
@@ -35,7 +35,6 @@
             <if test="name != null">name = #{name},</if>
             <if test="currentStockG != null">current_stock_g = #{currentStockG},</if>
             <if test="dailyConsumptionG != null">daily_consumption_g = #{dailyConsumptionG},</if>
-            <if test="status != null">status = #{status},</if>
         </set>
         WHERE id = #{id}
     </update>
@@ -47,7 +46,7 @@
     <select id="selectAll" resultMap="BaseResultMap">
         SELECT <include refid="BaseColumns"/>
         FROM supplement
-        ORDER BY FIELD(status, '告急', '偏低', '充足'), created_at ASC
+        ORDER BY created_at ASC
     </select>
 
 </mapper>

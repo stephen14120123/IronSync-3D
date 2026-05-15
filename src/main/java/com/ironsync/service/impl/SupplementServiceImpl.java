@@ -4,16 +4,18 @@ import com.ironsync.common.exception.BusinessException;
 import com.ironsync.common.exception.ErrorCode;
 import com.ironsync.dto.request.SupplementCreateDTO;
 import com.ironsync.dto.request.SupplementUpdateDTO;
+import com.ironsync.dto.response.SupplementStatusVO;
 import com.ironsync.dto.response.SupplementVO;
 import com.ironsync.entity.Supplement;
 import com.ironsync.mapper.SupplementMapper;
 import com.ironsync.service.SupplementService;
+import com.ironsync.service.supplement.StatusMachine;
 import org.springframework.beans.BeanUtils;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
+import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -21,9 +23,11 @@ import java.util.stream.Collectors;
 public class SupplementServiceImpl implements SupplementService {
 
     private final SupplementMapper supplementMapper;
+    private final StatusMachine statusMachine;
 
-    public SupplementServiceImpl(SupplementMapper supplementMapper) {
+    public SupplementServiceImpl(SupplementMapper supplementMapper, StatusMachine statusMachine) {
         this.supplementMapper = supplementMapper;
+        this.statusMachine = statusMachine;
     }
 
     @Override
@@ -32,7 +36,7 @@ public class SupplementServiceImpl implements SupplementService {
         Supplement entity = new Supplement();
         BeanUtils.copyProperties(dto, entity);
         entity.setUserId(1L);
-        entity.setStatus(calculateStatus(entity.getCurrentStockG(), entity.getDailyConsumptionG()));
+        entity.setCreatedAt(LocalDateTime.now());
         supplementMapper.insert(entity);
         return toVO(entity);
     }
@@ -46,7 +50,6 @@ public class SupplementServiceImpl implements SupplementService {
         }
         BeanUtils.copyProperties(dto, entity);
         entity.setUserId(1L);
-        entity.setStatus(calculateStatus(entity.getCurrentStockG(), entity.getDailyConsumptionG()));
         supplementMapper.update(entity);
         return toVO(entity);
     }
@@ -67,31 +70,48 @@ public class SupplementServiceImpl implements SupplementService {
     public List<SupplementVO> findAll() {
         return supplementMapper.selectAll().stream()
                 .map(this::toVO)
+                .sorted(Comparator.comparingInt(this::statusOrder))
                 .collect(Collectors.toList());
     }
 
-    /**
-     * 补剂状态机：根据库存和每日消耗量计算预警状态。
-     * 剩余天数 > 30 → 充足；7-30 → 偏低；< 7 → 告急
-     */
-    public static String calculateStatus(BigDecimal stock, BigDecimal daily) {
-        if (stock == null || daily == null || daily.compareTo(BigDecimal.ZERO) == 0) {
-            return "告急";
-        }
-        BigDecimal days = stock.divide(daily, 2, RoundingMode.HALF_UP);
-        if (days.compareTo(new BigDecimal("30")) > 0) {
-            return "充足";
-        } else if (days.compareTo(new BigDecimal("7")) >= 0) {
-            return "偏低";
-        } else {
-            return "告急";
-        }
+    @Override
+    public List<SupplementStatusVO> getStatusList() {
+        return supplementMapper.selectAll().stream()
+                .map(this::toStatusVO)
+                .sorted(Comparator.comparingInt(vo -> statusOrder(vo.getStatus())))
+                .collect(Collectors.toList());
     }
 
     private SupplementVO toVO(Supplement entity) {
         if (entity == null) return null;
         SupplementVO vo = new SupplementVO();
         BeanUtils.copyProperties(entity, vo);
+        vo.setStatus(statusMachine.calculate(entity.getCurrentStockG(), entity.getDailyConsumptionG()));
         return vo;
+    }
+
+    private SupplementStatusVO toStatusVO(Supplement entity) {
+        if (entity == null) return null;
+        SupplementStatusVO vo = new SupplementStatusVO();
+        vo.setId(entity.getId());
+        vo.setName(entity.getName());
+        vo.setCurrentStockG(entity.getCurrentStockG());
+        vo.setDailyConsumptionG(entity.getDailyConsumptionG());
+        vo.setStatus(statusMachine.calculate(entity.getCurrentStockG(), entity.getDailyConsumptionG()));
+        vo.setRemainingDays(statusMachine.calcRemainingDays(entity.getCurrentStockG(), entity.getDailyConsumptionG()));
+        return vo;
+    }
+
+    private int statusOrder(SupplementVO vo) {
+        return statusOrder(vo.getStatus());
+    }
+
+    private int statusOrder(String status) {
+        switch (status) {
+            case "告急": return 0;
+            case "偏低": return 1;
+            case "充足": return 2;
+            default: return 3;
+        }
     }
 }

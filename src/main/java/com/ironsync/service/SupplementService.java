@@ -2,6 +2,7 @@ package com.ironsync.service;
 
 import com.ironsync.dto.request.SupplementCreateDTO;
 import com.ironsync.dto.request.SupplementUpdateDTO;
+import com.ironsync.dto.response.SupplementStatusVO;
 import com.ironsync.dto.response.SupplementVO;
 
 import java.util.List;
@@ -17,4 +18,6 @@ public interface SupplementService {
     SupplementVO findById(Long id);
 
     List<SupplementVO> findAll();
+
+    List<SupplementStatusVO> getStatusList();
 }

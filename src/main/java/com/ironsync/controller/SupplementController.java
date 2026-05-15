@@ -3,6 +3,7 @@ package com.ironsync.controller;
 import com.ironsync.common.result.Result;
 import com.ironsync.dto.request.SupplementCreateDTO;
 import com.ironsync.dto.request.SupplementUpdateDTO;
+import com.ironsync.dto.response.SupplementStatusVO;
 import com.ironsync.dto.response.SupplementVO;
 import com.ironsync.service.SupplementService;
 import jakarta.validation.Valid;
@@ -45,5 +46,10 @@ public class SupplementController {
     @GetMapping
     public Result<List<SupplementVO>> findAll() {
         return Result.success(supplementService.findAll());
+    }
+
+    @GetMapping("/status")
+    public Result<List<SupplementStatusVO>> getStatus() {
+        return Result.success(supplementService.getStatusList());
     }
 }

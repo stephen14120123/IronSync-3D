@@ -12,6 +12,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -86,23 +87,34 @@ public class McpDiaryService {
         if (keyword == null || keyword.trim().isEmpty()) {
             return Collections.emptyList();
         }
-        String lowerKw = keyword.toLowerCase();
+
+        String[] keywords = keyword.trim().toLowerCase().split("\\s+");
         List<McpSearchResultVO> results = new ArrayList<>();
 
         for (McpDocument doc : cache) {
             String lowerText = doc.getPlainText().toLowerCase();
-            if (!lowerText.contains(lowerKw)) {
-                continue;
-            }
+            String lowerTitle = doc.getTitle().toLowerCase();
 
+            // AND 逻辑：所有关键词必须匹配（标题或正文）
+            boolean allMatch = true;
+            for (String kw : keywords) {
+                if (!lowerText.contains(kw) && !lowerTitle.contains(kw)) {
+                    allMatch = false;
+                    break;
+                }
+            }
+            if (!allMatch) continue;
+
+            // 收集匹配行（用第一个关键词作为主高亮）
+            String primaryKw = keywords[0];
             List<Integer> matchLines = new ArrayList<>();
             for (int i = 0; i < doc.getLines().size(); i++) {
-                if (doc.getLines().get(i).toLowerCase().contains(lowerKw)) {
+                if (doc.getLines().get(i).toLowerCase().contains(primaryKw)) {
                     matchLines.add(i + 1);
                 }
             }
 
-            String snippet = buildSnippet(doc.getLines(), keyword, matchLines);
+            String snippet = buildSnippet(doc.getLines(), matchLines);
 
             results.add(McpSearchResultVO.builder()
                     .filePath(doc.getFilePath())
@@ -121,31 +133,41 @@ public class McpDiaryService {
     }
 
     public String renderHtml(String filePath) {
-        Path target = Paths.get(filePath);
-        if (!target.isAbsolute()) {
-            target = Paths.get(mcpConfig.getDiaryPath()).resolve(target);
-        }
-        target = target.normalize();
-
-        Path root = Paths.get(mcpConfig.getDiaryPath()).normalize();
-        if (!target.startsWith(root)) {
-            throw new SecurityException("路径穿越拒绝: " + filePath);
-        }
-
-        if (!Files.exists(target) || !Files.isRegularFile(target)) {
-            throw new IllegalArgumentException("文件不存在: " + filePath);
-        }
-
         try {
-            String raw = Files.readString(target, StandardCharsets.UTF_8);
+            // 1. 规范化安全目录根路径（解析符号链接、大小写、.. 等）
+            Path diaryPath = Paths.get(mcpConfig.getDiaryPath()).toAbsolutePath().normalize();
+            String canonicalRoot = diaryPath.toFile().getCanonicalPath();
+
+            // 2. 规范化用户请求的目标路径
+            Path target = Paths.get(filePath);
+            if (!target.isAbsolute()) {
+                target = diaryPath.resolve(target);
+            }
+            String canonicalTarget = target.toFile().getCanonicalPath();
+
+            // 3. 绝对防御：目标必须在安全目录内（字符串前缀比较，已规避 Windows 大小写/反斜杠问题）
+            if (!canonicalTarget.startsWith(canonicalRoot + File.separator)) {
+                throw new SecurityException("路径穿越拒绝: " + filePath);
+            }
+
+            // 4. 检查文件存在
+            Path resolvedTarget = Paths.get(canonicalTarget);
+            if (!Files.exists(resolvedTarget) || !Files.isRegularFile(resolvedTarget)) {
+                throw new IllegalArgumentException("文件不存在: " + filePath);
+            }
+
+            // 5. 读取渲染
+            String raw = Files.readString(resolvedTarget, StandardCharsets.UTF_8);
             Document ast = parser.parse(raw);
             return htmlRenderer.render(ast);
+        } catch (SecurityException e) {
+            throw e;
         } catch (IOException e) {
-            throw new RuntimeException("读取文件失败: " + filePath, e);
+            throw new RuntimeException("文件读取失败: " + filePath, e);
         }
     }
 
-    private String buildSnippet(List<String> lines, String keyword, List<Integer> matchLines) {
+    private String buildSnippet(List<String> lines, List<Integer> matchLines) {
         if (matchLines.isEmpty()) return "";
         int idx = matchLines.get(0) - 1;
         int from = Math.max(0, idx - 2);

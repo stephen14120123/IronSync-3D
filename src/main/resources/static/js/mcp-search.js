@@ -13,9 +13,13 @@ function escapeHtml(text) {
 
 function highlightKeyword(text, keyword) {
     const escaped = escapeHtml(text);
-    const kw = escapeHtml(keyword);
-    const re = new RegExp(`(${kw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
-    return escaped.replace(re, '<mark>$1</mark>');
+    const keywords = keyword.trim().split(/\s+/);
+    let result = escaped;
+    keywords.forEach(kw => {
+        const re = new RegExp(`(${kw.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi');
+        result = result.replace(re, '<mark>$1</mark>');
+    });
+    return result;
 }
 
 function renderResults(results, keyword) {
