@@ -38,6 +38,11 @@ log/
 ### Claude ###
 .claude/
 
+### Node.js artifacts (root, mis-placed) ###
+node_modules/
+package-lock.json
+package.json
+
 ### Build Artifacts ###
 deploy/ironsync-3d.jar
 

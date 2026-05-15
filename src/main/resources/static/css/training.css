@@ -142,3 +142,46 @@
 .delete-btn:hover {
     background: rgba(244,67,54,0.15);
 }
+
+.pagination {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 0 4px;
+    border-top: 1px solid var(--border);
+    margin-top: 8px;
+}
+.page-info {
+    font-size: 12px;
+    color: var(--text-secondary);
+}
+.page-btns {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+.page-btn {
+    background: transparent;
+    border: 1px solid var(--border);
+    color: var(--text-secondary);
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.2s;
+    min-width: 32px;
+    text-align: center;
+}
+.page-btn:hover:not(:disabled):not(.active) {
+    border-color: var(--accent-blue);
+    color: var(--accent-blue);
+}
+.page-btn.active {
+    color: #fff;
+    border-color: var(--accent-blue);
+    background: var(--accent-blue);
+}
+.page-btn:disabled {
+    opacity: 0.3;
+    cursor: not-allowed;
+}

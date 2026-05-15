@@ -1,6 +1,7 @@
 package com.ironsync.service.impl;
 
 import com.ironsync.common.exception.BusinessException;
+import com.ironsync.common.exception.ErrorCode;
 import com.ironsync.dto.request.SupplementCreateDTO;
 import com.ironsync.dto.request.SupplementUpdateDTO;
 import com.ironsync.dto.response.SupplementVO;
@@ -41,7 +42,7 @@ public class SupplementServiceImpl implements SupplementService {
     public SupplementVO update(SupplementUpdateDTO dto) {
         Supplement entity = supplementMapper.selectById(dto.getId());
         if (entity == null) {
-            throw new BusinessException("补剂记录不存在");
+            throw new BusinessException(ErrorCode.SUPPLEMENT_NOT_FOUND);
         }
         BeanUtils.copyProperties(dto, entity);
         entity.setUserId(1L);

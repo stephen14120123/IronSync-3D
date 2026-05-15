@@ -1,5 +1,6 @@
 package com.ironsync.service;
 
+import com.github.pagehelper.PageInfo;
 import com.ironsync.dto.request.TrainingRecordCreateDTO;
 import com.ironsync.dto.request.TrainingRecordUpdateDTO;
 import com.ironsync.dto.response.TrainingRecordVO;
@@ -23,4 +24,8 @@ public interface TrainingRecordService {
     List<TrainingRecord> findByDateRaw(LocalDate date);
 
     List<TrainingRecordVO> findAll();
+
+    PageInfo<TrainingRecordVO> findAll(int page, int size);
+
+    List<TrainingRecordVO> findAllForChart();
 }

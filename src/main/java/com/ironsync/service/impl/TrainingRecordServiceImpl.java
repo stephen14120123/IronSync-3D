@@ -1,5 +1,11 @@
 package com.ironsync.service.impl;
 
+import com.github.pagehelper.Page;
+import com.github.pagehelper.PageHelper;
+import com.github.pagehelper.PageInfo;
+import com.ironsync.common.constant.ActionEnum;
+import com.ironsync.common.exception.ErrorCode;
+import com.ironsync.common.exception.BusinessException;
 import com.ironsync.dto.request.TrainingRecordCreateDTO;
 import com.ironsync.dto.request.TrainingRecordUpdateDTO;
 import com.ironsync.dto.response.TrainingRecordVO;
@@ -40,7 +46,7 @@ public class TrainingRecordServiceImpl implements TrainingRecordService {
     public TrainingRecordVO update(TrainingRecordUpdateDTO dto) {
         TrainingRecord entity = trainingRecordMapper.selectById(dto.getId());
         if (entity == null) {
-            throw new com.ironsync.common.exception.BusinessException("训练记录不存在");
+            throw new BusinessException(ErrorCode.TRAINING_RECORD_NOT_FOUND);
         }
         BeanUtils.copyProperties(dto, entity);
         entity.setUserId(1L);
@@ -79,10 +85,35 @@ public class TrainingRecordServiceImpl implements TrainingRecordService {
         return list.stream().map(this::toVO).collect(Collectors.toList());
     }
 
+    @Override
+    public PageInfo<TrainingRecordVO> findAll(int page, int size) {
+        PageHelper.startPage(page, size);
+        List<TrainingRecord> list = trainingRecordMapper.selectAll(1L);
+        List<TrainingRecordVO> voList = list.stream().map(this::toVO).collect(Collectors.toList());
+
+        PageInfo<TrainingRecordVO> pageInfo = new PageInfo<>(voList);
+        // list is actually Page<TrainingRecord> at runtime — restore pagination metadata
+        if (list instanceof Page<?> p) {
+            pageInfo.setPageNum(p.getPageNum());
+            pageInfo.setPageSize(p.getPageSize());
+            pageInfo.setTotal(p.getTotal());
+            pageInfo.setPages(p.getPages());
+        }
+        return pageInfo;
+    }
+
+    @Override
+    public List<TrainingRecordVO> findAllForChart() {
+        List<TrainingRecord> list = trainingRecordMapper.selectAll(1L);
+        if (list == null || list.isEmpty()) return Collections.emptyList();
+        return list.stream().map(this::toVO).collect(Collectors.toList());
+    }
+
     private TrainingRecordVO toVO(TrainingRecord entity) {
         if (entity == null) return null;
         TrainingRecordVO vo = new TrainingRecordVO();
         BeanUtils.copyProperties(entity, vo);
+        vo.setActionName(entity.getActionName().getDisplayName());
         return vo;
     }
 }

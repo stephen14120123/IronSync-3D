@@ -1,5 +1,6 @@
 package com.ironsync.dto.request;
 
+import com.ironsync.common.constant.ActionEnum;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 
@@ -10,8 +11,8 @@ import java.time.LocalDate;
 @Data
 public class TrainingRecordCreateDTO {
 
-    @NotBlank(message = "动作名称不能为空")
-    private String actionName;
+    @NotNull(message = "动作名称不能为空")
+    private ActionEnum actionName;
 
     @NotNull(message = "重量不能为空")
     @DecimalMin(value = "1.0", message = "重量不能小于 1kg")

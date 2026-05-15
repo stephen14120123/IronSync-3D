@@ -1,6 +1,7 @@
 package com.ironsync.service.impl;
 
 import com.ironsync.common.exception.BusinessException;
+import com.ironsync.common.exception.ErrorCode;
 import com.ironsync.dto.request.DietMoodCreateDTO;
 import com.ironsync.dto.request.DietMoodUpdateDTO;
 import com.ironsync.dto.response.DietMoodVO;
@@ -40,7 +41,7 @@ public class DietMoodServiceImpl implements DietMoodService {
     public DietMoodVO update(DietMoodUpdateDTO dto) {
         DietMood entity = dietMoodMapper.selectById(dto.getId());
         if (entity == null) {
-            throw new BusinessException("饮食情绪记录不存在");
+            throw new BusinessException(ErrorCode.DIET_MOOD_NOT_FOUND);
         }
         BeanUtils.copyProperties(dto, entity);
         entity.setUserId(1L);

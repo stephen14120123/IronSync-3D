@@ -8,5 +8,6 @@ server:
 mybatis:
   mapper-locations: classpath:mapper/*.xml
   type-aliases-package: com.ironsync.entity
+  type-handlers-package: com.ironsync.common.handler
   configuration:
     map-underscore-to-camel-case: true

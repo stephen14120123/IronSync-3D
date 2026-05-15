@@ -1,5 +1,6 @@
 package com.ironsync.controller;
 
+import com.github.pagehelper.PageInfo;
 import com.ironsync.common.result.Result;
 import com.ironsync.dto.request.TrainingRecordCreateDTO;
 import com.ironsync.dto.request.TrainingRecordUpdateDTO;
@@ -45,8 +46,15 @@ public class TrainingRecordController {
     }
 
     @GetMapping
-    public Result<List<TrainingRecordVO>> findAll() {
-        return Result.success(trainingRecordService.findAll());
+    public Result<PageInfo<TrainingRecordVO>> findAll(
+            @RequestParam(defaultValue = "1") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        return Result.success(trainingRecordService.findAll(page, size));
+    }
+
+    @GetMapping("/chart")
+    public Result<List<TrainingRecordVO>> chart() {
+        return Result.success(trainingRecordService.findAllForChart());
     }
 
     @GetMapping("/by-date")

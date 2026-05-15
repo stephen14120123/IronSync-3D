@@ -1,5 +1,9 @@
 let chart = null;
 let allRecords = [];
+let currentPage = 1;
+let pageSize = 10;
+let totalPages = 0;
+let totalRecords = 0;
 
 function initChart() {
     const dom = document.getElementById('strengthTrendChart');
@@ -87,20 +91,72 @@ function renderTable(records) {
             try {
                 await api.del('/training-records/' + btn.dataset.id);
                 showToast('已删除', 'success');
-                loadData();
+                loadTable();
             } catch (_) {}
         });
     });
 }
 
-async function loadData() {
+function renderPagination() {
+    const pageInfo = document.getElementById('pageInfo');
+    const pageNumbers = document.getElementById('pageNumbers');
+    const prevBtn = document.getElementById('prevPage');
+    const nextBtn = document.getElementById('nextPage');
+
+    if (!pageInfo || !pageNumbers) return;
+
+    if (totalPages <= 1) {
+        pageInfo.textContent = `共 ${totalRecords} 条`;
+        pageNumbers.innerHTML = '';
+        if (prevBtn) prevBtn.disabled = true;
+        if (nextBtn) nextBtn.disabled = true;
+        return;
+    }
+
+    pageInfo.textContent = `共 ${totalRecords} 条，第 ${currentPage}/${totalPages} 页`;
+
+    let html = '';
+    for (let i = 1; i <= totalPages; i++) {
+        html += `<button class="page-btn ${i === currentPage ? 'active' : ''}" data-page="${i}">${i}</button>`;
+    }
+    pageNumbers.innerHTML = html;
+
+    prevBtn.disabled = currentPage <= 1;
+    nextBtn.disabled = currentPage >= totalPages;
+
+    pageNumbers.querySelectorAll('.page-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            currentPage = parseInt(btn.dataset.page);
+            loadTable();
+        });
+    });
+    prevBtn.onclick = () => {
+        if (currentPage > 1) { currentPage--; loadTable(); }
+    };
+    nextBtn.onclick = () => {
+        if (currentPage < totalPages) { currentPage++; loadTable(); }
+    };
+}
+
+async function loadTable() {
     try {
-        allRecords = await api.get('/training-records') || [];
+        const resp = await api.get(`/training-records?page=${currentPage}&size=${pageSize}`);
+        allRecords = resp.list || [];
+        currentPage = resp.pageNum;
+        totalPages = resp.pages;
+        totalRecords = resp.total;
     } catch (_) {
         allRecords = [];
     }
-    renderChart(allRecords);
     renderTable(allRecords);
+    renderPagination();
+}
+
+async function loadChart() {
+    try {
+        const chartData = await api.get('/training-records/chart') || [];
+        renderChart(chartData);
+    } catch (_) {}
 }
 
 document.getElementById('trainingForm').addEventListener('submit', async e => {
@@ -119,9 +175,12 @@ document.getElementById('trainingForm').addEventListener('submit', async e => {
         showToast('训练记录已保存', 'success');
         e.target.reset();
         document.getElementById('rpeVal').textContent = '7';
-        loadData();
+        currentPage = 1;
+        loadTable();
+        loadChart();
     } catch (_) {}
 });
 
 initChart();
-loadData();
+loadTable();
+loadChart();

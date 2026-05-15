@@ -1,6 +1,7 @@
 package com.ironsync.service.impl;
 
 import com.ironsync.common.exception.BusinessException;
+import com.ironsync.common.exception.ErrorCode;
 import com.ironsync.dto.request.BodyMetricsCreateDTO;
 import com.ironsync.dto.request.BodyMetricsUpdateDTO;
 import com.ironsync.dto.response.BodyMetricsVO;
@@ -40,7 +41,7 @@ public class BodyMetricsServiceImpl implements BodyMetricsService {
     public BodyMetricsVO update(BodyMetricsUpdateDTO dto) {
         BodyMetrics entity = bodyMetricsMapper.selectById(dto.getId());
         if (entity == null) {
-            throw new BusinessException("身体指标记录不存在");
+            throw new BusinessException(ErrorCode.BODY_METRICS_NOT_FOUND);
         }
         BeanUtils.copyProperties(dto, entity);
         entity.setUserId(1L);

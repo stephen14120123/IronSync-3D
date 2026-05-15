@@ -6,6 +6,7 @@ spring:
     driver-class-name: com.mysql.cj.jdbc.Driver
 
 mybatis:
+  type-handlers-package: com.ironsync.common.handler
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
 
@@ -13,3 +14,15 @@ ironsync:
   mcp:
     diary-path: ./data/notes
   test-reports-path: deploy/test-reports
+  mesh:
+    mappings:
+      - action: 杠铃深蹲
+        meshes: [LeftLeg, RightLeg, LowerBack]
+      - action: 罗马尼亚硬拉
+        meshes: [LowerBack, LeftLeg, RightLeg]
+      - action: 卧推
+        meshes: [Chest, LeftArm, RightArm]
+      - action: 推举
+        meshes: [LeftArm, RightArm, Torso]
+      - action: 引体向上
+        meshes: [LeftArm, RightArm, Torso]

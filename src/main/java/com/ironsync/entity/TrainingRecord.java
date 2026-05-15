@@ -1,5 +1,6 @@
 package com.ironsync.entity;
 
+import com.ironsync.common.constant.ActionEnum;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,7 +16,7 @@ import java.time.LocalDate;
 public class TrainingRecord {
     private Long id;
     private Long userId;
-    private String actionName;
+    private ActionEnum actionName;
     private BigDecimal weightKg;
     private Integer reps;
     private Integer sets;

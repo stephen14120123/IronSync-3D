@@ -6,7 +6,7 @@
     <resultMap id="BaseResultMap" type="com.ironsync.entity.TrainingRecord">
         <id property="id" column="id"/>
         <result property="userId" column="user_id"/>
-        <result property="actionName" column="action_name"/>
+        <result property="actionName" column="action_name" typeHandler="com.ironsync.common.handler.ActionEnumTypeHandler"/>
         <result property="weightKg" column="weight_kg"/>
         <result property="reps" column="reps"/>
         <result property="sets" column="sets"/>

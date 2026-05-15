@@ -13,6 +13,14 @@ test.describe('Training Record CRUD', () => {
         await expect(page.locator('#strengthTrendChart canvas')).toBeVisible();
     });
 
+    test('should display pagination controls with record count', async ({ page }) => {
+        // Verify the pagination DOM exists and shows info after data loads
+        await page.waitForSelector('#pagination', { timeout: 10000 });
+        await expect(page.locator('#pageInfo')).toBeVisible();
+        // Should show a count string (at minimum from seed data)
+        await expect(page.locator('#pageInfo')).not.toBeEmpty();
+    });
+
     test('should create a training record and verify it in the history table', async ({ page }) => {
         const today = new Date().toISOString().slice(0, 10);
 
