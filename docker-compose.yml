@@ -1,0 +1,55 @@
+version: "3.8"
+
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: ironsync-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-123456}
+      MYSQL_DATABASE: ironsync_3d
+    volumes:
+      - mysql-data:/var/lib/mysql
+      - ./deploy/init-db.sql:/docker-entrypoint-initdb.d/init-db.sql:ro
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+      start_period: 30s
+    ports:
+      - "3306:3306"
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: ironsync-app
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    environment:
+      # ---- Database connection (all overridable via env vars) ----
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/ironsync_3d?useUnicode=true&characterEncoding=utf-8&serverTimezone=Asia/Shanghai
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: ${MYSQL_ROOT_PASSWORD:-123456}
+
+      # ---- HikariCP retry (prevents race with init-db.sql) ----
+      SPRING_DATASOURCE_HIKARI_INITIALIZATION_FAIL_TIMEOUT: -1
+      SPRING_DATASOURCE_HIKARI_CONNECTION_TIMEOUT: 30000
+
+      # ---- Profile: prevents loading application-dev.yml (has localhost) ----
+      SPRING_PROFILES_ACTIVE: ""
+
+      # ---- Custom config overrides ----
+      IRONSYNC_MCP_DIARY_PATH: /app/data/notes
+      IRONSYNC_TEST_REPORTS_PATH: /app/test-reports
+    volumes:
+      - ./data/notes:/app/data/notes
+      - ./deploy/test-reports:/app/test-reports
+    ports:
+      - "8080:8080"
+
+volumes:
+  mysql-data:

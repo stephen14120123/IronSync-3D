@@ -1,6 +1,9 @@
 package com.ironsync.controller;
 
 import com.ironsync.common.result.Result;
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.context.annotation.Profile;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -9,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.time.LocalDate;
 
+@Tag(name = "测试数据", description = "开发环境下的测试数据重置接口（仅 dev profile 可用）")
 @Profile("dev")
 @RestController
 @RequestMapping("/api/test")
@@ -20,6 +24,8 @@ public class TestDataController {
         this.jdbcTemplate = jdbcTemplate;
     }
 
+    @Operation(summary = "重置数据库", description = "清空所有业务表并插入默认种子数据，仅限 dev 环境使用")
+    @ApiResponse(responseCode = "200", description = "重置成功")
     @PostMapping("/db-reset")
     public Result<Void> resetDatabase() {
         jdbcTemplate.execute("SET FOREIGN_KEY_CHECKS = 0");
