@@ -8,14 +8,6 @@
     <link rel="stylesheet" href="css/global.css">
     <link rel="stylesheet" href="css/dashboard.css">
 
-    <script type="importmap">
-    {
-        "imports": {
-            "three": "https://cdn.jsdelivr.net/npm/three@0.150.0/build/three.module.js",
-            "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.150.0/examples/jsm/"
-        }
-    }
-    </script>
 </head>
 <body>
     <div id="top-bar">
@@ -31,7 +23,35 @@
         </nav>
     </div>
 
-    <div id="three-canvas-container"></div>
+    <div id="body-svg-overlay" class="tech-body-container">
+        <svg viewBox="0 0 200 350" xmlns="http://www.w3.org/2000/svg" class="tech-body-svg">
+            <defs>
+                <!-- Top-left light source gradient: lighter top-left, darker bottom-right -->
+                <linearGradient id="metal-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#4a4d5e" />
+                    <stop offset="100%" stop-color="#1e2028" />
+                </linearGradient>
+                <linearGradient id="hover-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#5599ff" />
+                    <stop offset="100%" stop-color="#2244aa" />
+                </linearGradient>
+                <linearGradient id="active-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stop-color="#00ff88" />
+                    <stop offset="100%" stop-color="#008855" />
+                </linearGradient>
+            </defs>
+            <rect x="85" y="20" width="30" height="35" rx="8" data-mesh="Head" class="muscle-part" fill="url(#metal-grad)" />
+            <polygon points="90,58 110,58 105,70 95,70" class="muscle-part core-frame" fill="url(#metal-grad)" />
+            <polygon points="98,75 50,75 60,120 98,130" data-mesh="Chest" class="muscle-part" fill="url(#metal-grad)" />
+            <polygon points="102,75 150,75 140,120 102,130" data-mesh="Chest" class="muscle-part" fill="url(#metal-grad)" />
+            <polygon points="62,125 138,125 125,200 75,200" data-mesh="Abdominal" class="muscle-part" fill="url(#metal-grad)" />
+            <polygon points="45,75 20,150 35,155 55,120" data-mesh="LeftArm" class="muscle-part" fill="url(#metal-grad)" />
+            <polygon points="155,75 180,150 165,155 145,120" data-mesh="RightArm" class="muscle-part" fill="url(#metal-grad)" />
+            <polygon points="70,205 40,320 65,320 95,215" data-mesh="Quad_L" class="muscle-part" fill="url(#metal-grad)" />
+            <polygon points="130,205 160,320 135,320 105,215" data-mesh="Quad_R" class="muscle-part" fill="url(#metal-grad)" />
+            <line x1="100" y1="75" x2="100" y2="200" stroke="#333" stroke-width="2" pointer-events="none" />
+        </svg>
+    </div>
 
     <div class="glass-card left">
         <h3>今日训练概览</h3>
@@ -70,9 +90,9 @@
         </div>
     </div>
 
-    <div id="hint-overlay">拖拽旋转 · 滚轮缩放</div>
+    <div id="hint-overlay">点击身体部位查看详情</div>
 
     <script src="js/api.js"></script>
-    <script type="module" src="js/dashboard.js"></script>
+    <script src="js/dashboard.js"></script>
 </body>
 </html>
