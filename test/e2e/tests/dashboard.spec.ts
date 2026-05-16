@@ -1,28 +1,28 @@
 import { test, expect } from '@playwright/test';
 import { gotoWithAuth } from '../helpers/auth-helper';
 
-test.describe('Dashboard 3D Scene', () => {
+test.describe('Dashboard 2.5D SVG Scene', () => {
 
-    test('should load the 3D scene canvas', async ({ page }) => {
+    test('should render the tech-body SVG overlay', async ({ page }) => {
         await gotoWithAuth(page, '/');
         await expect(page).toHaveTitle(/IronSync-3D/);
 
-        // Wait for Three.js to render the canvas
-        const canvas = page.locator('#three-canvas-container canvas');
-        await expect(canvas).toBeVisible({ timeout: 15000 });
+        // Verify SVG container and tech-body-svg element are rendered
+        const container = page.locator('#body-svg-overlay.tech-body-container');
+        await expect(container).toBeVisible({ timeout: 15000 });
+
+        const svg = page.locator('.tech-body-svg');
+        await expect(svg).toBeVisible();
     });
 
-    test('should not show 3D loading failure', async ({ page }) => {
+    test('should render muscle-part geometric elements', async ({ page }) => {
         await gotoWithAuth(page, '/');
 
-        // Wait for canvas or hint to appear
-        await page.waitForSelector('#three-canvas-container canvas, #hint-overlay', {
-            timeout: 15000,
-        });
-
-        // Hint should NOT contain failure text
-        const hint = page.locator('#hint-overlay');
-        await expect(hint).not.toContainText(/失败/);
+        // SVG should contain at least one .muscle-part element with data-mesh attribute
+        await page.waitForSelector('.muscle-part[data-mesh]', { timeout: 15000 });
+        const muscleParts = page.locator('.muscle-part[data-mesh]');
+        const count = await muscleParts.count();
+        expect(count).toBeGreaterThanOrEqual(1);
     });
 
     test('should display training stats from today\'s data', async ({ page }) => {
