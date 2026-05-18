@@ -4,7 +4,7 @@ Remove-Item Env:\ANTHROPIC_API_KEY -ErrorAction SilentlyContinue
 
 # 2. 配置 DeepSeek 官方原生兼容接口
 $env:ANTHROPIC_BASE_URL="https://api.deepseek.com/anthropic"
-$env:ANTHROPIC_AUTH_TOKEN="sk-899f2aab1f2e4b64a3e62512f5828b14"
+$env:ANTHROPIC_AUTH_TOKEN="sk-e6b236ce69d34e7791a2d093a05e294b"
 
 # 3. 将底层模型全部重定向为 DeepSeek (推荐日常敲代码用 chat，逻辑推导用 reasoner)
 $env:ANTHROPIC_MODEL="deepseek-chat"
@@ -15,4 +15,4 @@ $env:CLAUDE_CODE_SUBAGENT_MODEL="deepseek-chat"
 $env:CLAUDE_CODE_EFFORT_LEVEL="max"
 
 # 4. 穿透环境变量直接启动 Claude Code
-npx @anthropic-ai/claude-code
+claude
