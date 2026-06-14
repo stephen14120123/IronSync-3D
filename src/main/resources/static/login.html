@@ -3,191 +3,522 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>登录 — IronSync-3D</title>
-    <link rel="stylesheet" href="css/global.css">
+    <title>IronSync-3D · 登录</title>
     <style>
-        * { box-sizing: border-box; margin: 0; padding: 0; }
+        /* ===== Reset & Base ===== */
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
         body {
-            background: #121212;
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
+            background: #0C0C0C;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             overflow: hidden;
         }
 
-        /* Animated grid background */
+        /* ===== Animated Grid ===== */
         body::before {
             content: '';
-            position: fixed;
-            inset: 0;
+            position: fixed; inset: 0;
             background:
-                linear-gradient(rgba(33,150,243,0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(33,150,243,0.03) 1px, transparent 1px);
-            background-size: 60px 60px;
+                linear-gradient(rgba(255, 107, 0, 0.04) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 107, 0, 0.04) 1px, transparent 1px);
+            background-size: 56px 56px;
             z-index: 0;
-            animation: gridPulse 8s ease-in-out infinite;
+            animation: gridPulse 6s ease-in-out infinite;
         }
 
         @keyframes gridPulse {
-            0%, 100% { opacity: 0.4; }
-            50% { opacity: 1; }
+            0%, 100% { opacity: 0.3; }
+            50%      { opacity: 0.8; }
         }
 
+        /* ===== Glow Orbs ===== */
+        body::after {
+            content: '';
+            position: fixed;
+            width: 420px; height: 420px;
+            border-radius: 50%;
+            background: radial-gradient(circle at center, rgba(255, 107, 0, 0.08), transparent 70%);
+            top: -120px; right: -120px;
+            z-index: 0;
+            animation: orbFloat 12s ease-in-out infinite alternate;
+        }
+        @keyframes orbFloat {
+            0%   { transform: translate(0, 0) scale(1); }
+            100% { transform: translate(-60px, 80px) scale(1.15); }
+        }
+
+        /* ===== Container ===== */
         .login-container {
-            position: relative;
-            z-index: 1;
-            width: 100%;
-            max-width: 400px;
-            padding: 24px;
+            position: relative; z-index: 1;
+            width: 100%; max-width: 410px;
+            padding: 20px;
         }
 
+        /* ===== Card ===== */
         .login-card {
-            background: rgba(30, 30, 30, 0.85);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 16px;
-            padding: 48px 36px 36px;
-            box-shadow: 0 8px 40px rgba(0,0,0,0.5),
-                        0 0 80px rgba(33,150,243,0.05);
+            background: rgba(22, 22, 22, 0.88);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.06);
+            border-radius: 20px;
+            padding: 44px 36px 32px;
+            box-shadow:
+                0 12px 48px rgba(0, 0, 0, 0.6),
+                0 0 120px rgba(255, 107, 0, 0.04);
+            overflow: hidden;
+            position: relative;
         }
 
+        /* ===== Brand ===== */
         .brand {
             text-align: center;
-            margin-bottom: 40px;
+            margin-bottom: 36px;
+            user-select: none;
         }
-
+        .brand .logo-icon {
+            font-size: 36px;
+            display: block;
+            margin-bottom: 4px;
+        }
         .brand h1 {
-            font-size: 28px;
-            font-weight: 700;
-            letter-spacing: 4px;
-            color: #E0E0E0;
+            font-size: 26px;
+            font-weight: 800;
+            letter-spacing: 3px;
+            color: #E8E8E8;
         }
-
         .brand h1 span {
-            color: #2196F3;
+            color: #FF6B00;
         }
-
         .brand .sub {
-            font-size: 12px;
-            color: #666;
+            font-size: 11px;
+            color: #555;
             letter-spacing: 2px;
-            margin-top: 8px;
+            margin-top: 6px;
             text-transform: uppercase;
         }
 
-        .form-group {
-            margin-bottom: 24px;
+        /* ===== Form Tabs ===== */
+        .tab-bar {
+            display: flex;
+            margin-bottom: 28px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+        }
+        .tab-bar .tab {
+            flex: 1;
+            text-align: center;
+            padding: 10px 0 12px;
+            font-size: 14px;
+            font-weight: 600;
+            color: #555;
+            cursor: pointer;
+            transition: color 0.25s, border-color 0.25s;
+            border-bottom: 2px solid transparent;
+            user-select: none;
+        }
+        .tab-bar .tab:hover {
+            color: #999;
+        }
+        .tab-bar .tab.active {
+            color: #FF6B00;
+            border-bottom-color: #FF6B00;
         }
 
+        /* ===== Form Panels ===== */
+        .form-panels {
+            position: relative;
+            overflow: hidden;
+        }
+        .form-panel {
+            width: 100%;
+            transition: opacity 0.35s ease, transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .form-panel.hidden {
+            position: absolute; top: 0; left: 0;
+            opacity: 0;
+            transform: translateX(24px);
+            pointer-events: none;
+        }
+        .form-panel:not(.hidden) {
+            position: relative;
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        /* ===== Form Groups ===== */
+        .form-group {
+            margin-bottom: 20px;
+        }
         .form-group label {
             display: block;
-            font-size: 12px;
-            color: #9E9E9E;
+            font-size: 11px;
+            color: #777;
             letter-spacing: 1px;
-            margin-bottom: 8px;
+            margin-bottom: 6px;
             text-transform: uppercase;
         }
-
         .form-group input {
             width: 100%;
-            padding: 12px 16px;
-            background: rgba(0,0,0,0.3);
-            border: 1px solid rgba(255,255,255,0.08);
-            border-radius: 8px;
+            padding: 13px 16px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid rgba(255, 255, 255, 0.07);
+            border-radius: 10px;
             color: #E0E0E0;
             font-size: 15px;
             outline: none;
             transition: border-color 0.25s, box-shadow 0.25s;
         }
-
         .form-group input:focus {
-            border-color: #2196F3;
-            box-shadow: 0 0 0 3px rgba(33,150,243,0.15);
+            border-color: #FF6B00;
+            box-shadow: 0 0 0 3px rgba(255, 107, 0, 0.12);
         }
-
         .form-group input::placeholder {
-            color: #555;
+            color: #444;
+        }
+        .form-group input:-webkit-autofill,
+        .form-group input:-webkit-autofill:hover,
+        .form-group input:-webkit-autofill:focus {
+            -webkit-box-shadow: 0 0 0 1000px #1A1A1A inset;
+            -webkit-text-fill-color: #E0E0E0;
+            caret-color: #E0E0E0;
         }
 
-        .login-btn {
+        /* ===== Password strength hint ===== */
+        .hint {
+            font-size: 11px;
+            color: #555;
+            margin-top: 4px;
+            padding-left: 4px;
+        }
+
+        /* ===== Submit Button ===== */
+        .submit-btn {
             width: 100%;
-            padding: 12px;
-            background: linear-gradient(135deg, #2196F3, #1976D2);
+            padding: 13px;
+            background: linear-gradient(135deg, #FF6B00 0%, #E55D00 100%);
             border: none;
-            border-radius: 8px;
+            border-radius: 10px;
             color: #fff;
             font-size: 15px;
-            font-weight: 600;
+            font-weight: 700;
             letter-spacing: 1px;
             cursor: pointer;
-            transition: opacity 0.2s, transform 0.15s;
-            margin-top: 8px;
+            transition: opacity 0.2s, transform 0.15s, box-shadow 0.25s;
+            margin-top: 4px;
+            box-shadow: 0 4px 20px rgba(255, 107, 0, 0.25);
         }
-
-        .login-btn:hover {
-            opacity: 0.9;
+        .submit-btn:hover {
+            opacity: 0.92;
             transform: translateY(-1px);
+            box-shadow: 0 6px 28px rgba(255, 107, 0, 0.35);
         }
-
-        .login-btn:active {
+        .submit-btn:active {
             transform: translateY(0);
         }
-
-        .login-btn:disabled {
-            opacity: 0.5;
+        .submit-btn:disabled {
+            opacity: 0.45;
             cursor: not-allowed;
             transform: none;
+            box-shadow: none;
         }
 
-        .error-msg {
-            color: #F44336;
+        /* ===== Error / Success Message ===== */
+        .msg-box {
             font-size: 13px;
             text-align: center;
+            min-height: 22px;
+            line-height: 1.5;
+            margin-top: 14px;
+            padding: 0 4px;
+            transition: color 0.2s;
+        }
+        .msg-box.error { color: #F44336; }
+        .msg-box.success { color: #4CAF50; }
+
+        /* ===== Toggle Link ===== */
+        .toggle-link {
+            text-align: center;
             margin-top: 16px;
-            min-height: 20px;
+            font-size: 13px;
+            color: #555;
+        }
+        .toggle-link a {
+            color: #FF6B00;
+            cursor: pointer;
+            text-decoration: none;
+            font-weight: 600;
+            transition: opacity 0.2s;
+        }
+        .toggle-link a:hover {
+            opacity: 0.8;
+            text-decoration: underline;
         }
 
+        /* ===== Footer ===== */
         .footer {
             text-align: center;
             margin-top: 24px;
-            font-size: 11px;
-            color: #444;
+            font-size: 10px;
+            color: #3A3A3A;
             letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+
+        /* ===== Responsive ===== */
+        @media (max-width: 480px) {
+            .login-card { padding: 32px 24px 24px; border-radius: 16px; }
+            .brand h1 { font-size: 22px; }
         }
     </style>
 </head>
 <body>
     <div class="login-container">
         <div class="login-card">
+
+            <!-- Brand -->
             <div class="brand">
+                <span class="logo-icon">⚡</span>
                 <h1>IRON<span>SYNC</span> 3D</h1>
                 <div class="sub">智能健身管理平台</div>
             </div>
 
-            <form id="loginForm" autocomplete="off">
-                <div class="form-group">
-                    <label for="username">用户名</label>
-                    <input type="text" id="username" name="username"
-                           placeholder="请输入用户名" value="admin" autofocus>
-                </div>
-                <div class="form-group">
-                    <label for="password">密码</label>
-                    <input type="password" id="password" name="password"
-                           placeholder="请输入密码" value="123456">
-                </div>
-                <button type="submit" class="login-btn" id="loginBtn">登 录</button>
-            </form>
+            <!-- Tab bar -->
+            <div class="tab-bar">
+                <div class="tab active" data-tab="login">登 录</div>
+                <div class="tab" data-tab="register">注 册</div>
+            </div>
 
-            <div class="error-msg" id="errorMsg"></div>
+            <!-- Form panels -->
+            <div class="form-panels">
+
+                <!-- ===== LOGIN PANEL ===== -->
+                <div class="form-panel" id="panel-login">
+                    <form id="loginForm" autocomplete="off">
+                        <div class="form-group">
+                            <label for="loginUser">用户名</label>
+                            <input type="text" id="loginUser" placeholder="请输入用户名" autofocus>
+                        </div>
+                        <div class="form-group">
+                            <label for="loginPass">密码</label>
+                            <input type="password" id="loginPass" placeholder="请输入密码">
+                        </div>
+                        <button type="submit" class="submit-btn" id="loginBtn">登 录</button>
+                    </form>
+                    <div class="msg-box" id="loginMsg"></div>
+                    <div class="toggle-link">
+                        没有账号？<a id="switchToRegister">创建一个 →</a>
+                    </div>
+                </div>
+
+                <!-- ===== REGISTER PANEL ===== -->
+                <div class="form-panel hidden" id="panel-register">
+                    <form id="registerForm" autocomplete="off">
+                        <div class="form-group">
+                            <label for="regUser">用户名</label>
+                            <input type="text" id="regUser" placeholder="2-20 个字符">
+                        </div>
+                        <div class="form-group">
+                            <label for="regPass">密码</label>
+                            <input type="password" id="regPass" placeholder="至少 4 位">
+                        </div>
+                        <div class="form-group">
+                            <label for="regConfirm">确认密码</label>
+                            <input type="password" id="regConfirm" placeholder="再次输入密码">
+                        </div>
+                        <button type="submit" class="submit-btn" id="registerBtn">注 册</button>
+                    </form>
+                    <div class="msg-box" id="registerMsg"></div>
+                    <div class="toggle-link">
+                        已有账号？<a id="switchToLogin">去登录 →</a>
+                    </div>
+                </div>
+            </div>
+
             <div class="footer">IRONSYNC 3D v1.0</div>
         </div>
     </div>
 
-    <script src="js/api.js"></script>
-    <script src="js/auth.js"></script>
+    <script>
+        // ============================================================
+        //  Tab Switch
+        // ============================================================
+        const tabs = document.querySelectorAll('.tab');
+        const panels = {
+            login: document.getElementById('panel-login'),
+            register: document.getElementById('panel-register')
+        };
+
+        function switchTab(name) {
+            // Update tabs
+            tabs.forEach(t => t.classList.toggle('active', t.dataset.tab === name));
+
+            // Update panels
+            Object.entries(panels).forEach(([key, el]) => {
+                el.classList.toggle('hidden', key !== name);
+            });
+
+            // Clear messages
+            document.getElementById('loginMsg').textContent = '';
+            document.getElementById('registerMsg').textContent = '';
+        }
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => switchTab(tab.dataset.tab));
+        });
+
+        document.getElementById('switchToRegister').addEventListener('click', () => switchTab('register'));
+        document.getElementById('switchToLogin').addEventListener('click', () => switchTab('login'));
+
+        // ============================================================
+        //  Helper: show message
+        // ============================================================
+        function showMsg(el, msg, type) {
+            el.textContent = msg;
+            el.className = 'msg-box ' + type;
+        }
+
+        function clearMsg(el) {
+            el.textContent = '';
+            el.className = 'msg-box';
+        }
+
+        // ============================================================
+        //  Helper: set loading
+        // ============================================================
+        function setLoading(btn, loading, text) {
+            btn.disabled = loading;
+            btn.textContent = loading ? '处理中...' : text;
+        }
+
+        // ============================================================
+        //  LOGIN
+        // ============================================================
+        const loginForm = document.getElementById('loginForm');
+        const loginBtn = document.getElementById('loginBtn');
+        const loginMsg = document.getElementById('loginMsg');
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            clearMsg(loginMsg);
+
+            const username = document.getElementById('loginUser').value.trim();
+            const password = document.getElementById('loginPass').value.trim();
+
+            if (!username || !password) {
+                showMsg(loginMsg, '请输入用户名和密码', 'error');
+                return;
+            }
+
+            setLoading(loginBtn, true, '登 录');
+
+            try {
+                const res = await fetch('/api/auth/login', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+
+                // Try to parse JSON even on non-2xx status
+                let json;
+                try { json = await res.json(); } catch (_) {
+                    showMsg(loginMsg, '服务器返回异常，请稍后重试', 'error');
+                    setLoading(loginBtn, false, '登 录');
+                    return;
+                }
+
+                if (json.code === 200) {
+                    // Store token — use 'auth_token' for compatibility with api.js
+                    localStorage.setItem('auth_token', json.data.token);
+                    // Also store user info for display
+                    localStorage.setItem('auth_user', json.data.username);
+
+                    showMsg(loginMsg, '登录成功，正在跳转...', 'success');
+                    setTimeout(() => { window.location.href = '/'; }, 400);
+                } else {
+                    showMsg(loginMsg, json.message || '登录失败', 'error');
+                    setLoading(loginBtn, false, '登 录');
+                }
+            } catch (err) {
+                showMsg(loginMsg, '网络异常，请检查服务器是否运行', 'error');
+                setLoading(loginBtn, false, '登 录');
+            }
+        });
+
+        // ============================================================
+        //  REGISTER
+        // ============================================================
+        const registerForm = document.getElementById('registerForm');
+        const registerBtn = document.getElementById('registerBtn');
+        const registerMsg = document.getElementById('registerMsg');
+
+        registerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            clearMsg(registerMsg);
+
+            const username = document.getElementById('regUser').value.trim();
+            const password = document.getElementById('regPass').value;
+            const confirm = document.getElementById('regConfirm').value;
+
+            // Client-side validation
+            if (!username || !password || !confirm) {
+                showMsg(registerMsg, '请填写所有字段', 'error');
+                return;
+            }
+            if (username.length < 2 || username.length > 20) {
+                showMsg(registerMsg, '用户名长度需在 2-20 个字符之间', 'error');
+                return;
+            }
+            if (password.length < 4) {
+                showMsg(registerMsg, '密码长度不能少于 4 位', 'error');
+                return;
+            }
+            if (password !== confirm) {
+                showMsg(registerMsg, '两次密码输入不一致', 'error');
+                return;
+            }
+
+            setLoading(registerBtn, true, '注 册');
+
+            try {
+                const res = await fetch('/api/auth/register', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                });
+
+                let json;
+                try { json = await res.json(); } catch (_) {
+                    showMsg(registerMsg, '服务器返回异常，请稍后重试', 'error');
+                    setLoading(registerBtn, false, '注 册');
+                    return;
+                }
+
+                if (json.code === 200) {
+                    // Auto-login after registration
+                    localStorage.setItem('auth_token', json.data.token);
+                    localStorage.setItem('auth_user', json.data.username);
+
+                    showMsg(registerMsg, '注册成功！正在跳转...', 'success');
+                    setTimeout(() => { window.location.href = '/'; }, 400);
+                } else {
+                    showMsg(registerMsg, json.message || '注册失败', 'error');
+                    setLoading(registerBtn, false, '注 册');
+                }
+            } catch (err) {
+                showMsg(registerMsg, '网络异常，请检查服务器是否运行', 'error');
+                setLoading(registerBtn, false, '注 册');
+            }
+        });
+
+        // ============================================================
+        //  Enter key support: switch tab in register shows "already have account"
+        // ============================================================
+        // Pre-fill login demo hint
+        document.getElementById('loginUser').placeholder = 'admin';
+        document.getElementById('loginPass').placeholder = '123456';
+    </script>
 </body>
 </html>

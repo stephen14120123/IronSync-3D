@@ -1,4 +1,7 @@
 target/
+
+### Scripts ###
+ai.ps1
 !.mvn/wrapper/maven-wrapper.jar
 
 ### STS ###
