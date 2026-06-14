@@ -1,69 +1,75 @@
-.glass-card {
+/* ============================================================
+   IronSync-3D · Dashboard (Glassmorphism)
+   ============================================================ */
+
+/* ---- Floating glass overlay cards ---- */
+.glass-card.left {
     position: fixed;
     top: 50%;
     transform: translateY(-50%);
-    width: 260px;
-    padding: 24px;
-    background: var(--bg-glass);
-    backdrop-filter: var(--glass-blur);
-    -webkit-backdrop-filter: var(--glass-blur);
-    border-radius: var(--radius);
-    border: 1px solid var(--border);
+    width: 220px;
+    left: 20px;
     z-index: 10;
-    transition: transform 0.3s ease;
-}
-.glass-card:hover {
-    transform: translateY(-50%) scale(1.03);
-}
-.glass-card.left {
-    left: 32px;
 }
 .glass-card.right {
-    right: 32px;
+    position: fixed;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 220px;
+    right: 20px;
+    z-index: 10;
 }
 
-.glass-card h3 {
-    font-size: 13px;
-    color: var(--text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 16px;
-}
-.glass-card .stat-item {
+.glass-card .stat-row {
     display: flex;
     justify-content: space-between;
-    padding: 8px 0;
-    border-bottom: 1px solid var(--border);
-    font-size: 14px;
+    align-items: center;
+    padding: 7px 0;
+    border-bottom: var(--border-w) solid var(--glass-border);
+    font-size: 13px;
 }
-.glass-card .stat-item:last-child {
+.glass-card .stat-row:last-of-type {
     border-bottom: none;
+}
+.glass-card .stat-label {
+    color: var(--text-secondary);
+    font-size: 11px;
+    letter-spacing: var(--tracking);
 }
 .glass-card .stat-value {
     color: var(--text-primary);
-    font-weight: 600;
+    font-weight: 700;
+    font-family: var(--font-mono);
+    font-size: 14px;
 }
 
-.ring-progress {
+/* ---- Ring progress ---- */
+.ring-wrap {
+    position: relative;
     display: flex;
     justify-content: center;
-    margin: 12px 0;
+    margin: 8px 0;
+}
+.ring-progress {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
 }
 .ring-progress svg {
-    width: 120px;
-    height: 120px;
+    width: 100px;
+    height: 100px;
     transform: rotate(-90deg);
 }
 .ring-progress .bg {
     fill: none;
-    stroke: rgba(255,255,255,0.06);
-    stroke-width: 8;
+    stroke: rgba(255, 255, 255, 0.04);
+    stroke-width: 6;
 }
 .ring-progress .fg {
     fill: none;
-    stroke: var(--accent-green);
-    stroke-width: 8;
-    stroke-linecap: round;
+    stroke: var(--neon-orange);
+    stroke-width: 6;
     transition: stroke-dashoffset 0.6s ease;
 }
 .ring-progress .center-label {
@@ -73,32 +79,40 @@
     align-items: center;
     justify-content: center;
     font-size: 22px;
-    font-weight: 700;
+    font-weight: 900;
     color: var(--text-primary);
+    font-family: var(--font-mono);
+    line-height: 1.2;
 }
 .ring-progress .center-label small {
-    font-size: 11px;
-    color: var(--text-secondary);
-    font-weight: 400;
+    font-size: 9px;
+    color: var(--text-muted);
+    font-weight: 600;
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
 }
 
+/* ---- Hint overlay (bottom center) ---- */
 #hint-overlay {
     position: fixed;
-    bottom: 48px;
+    bottom: 36px;
     left: 50%;
     transform: translateX(-50%);
-    background: rgba(0,0,0,0.7);
-    backdrop-filter: blur(8px);
-    padding: 12px 24px;
-    border-radius: 8px;
-    border: 1px solid var(--border);
-    color: var(--text-secondary);
-    font-size: 13px;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    padding: 10px 20px;
+    border: var(--border-w) solid var(--glass-border);
+    border-radius: var(--radius-btn);
+    color: var(--text-muted);
+    font-size: 12px;
+    font-family: var(--font-mono);
     z-index: 10;
     pointer-events: none;
+    letter-spacing: var(--tracking);
 }
 
-/* ---- Tech-Body SVG (3D holographic projection) ---- */
+/* ---- 2.5D Tech Body SVG ---- */
 .tech-body-container {
     position: fixed;
     top: 0;
@@ -111,41 +125,34 @@
     z-index: 5;
     pointer-events: none;
     perspective: 1000px;
-    transform-style: preserve-3d;
 }
 .tech-body-svg {
     width: 100%;
-    max-width: 300px;
+    max-width: 280px;
     height: auto;
     transform: rotateX(10deg) rotateY(-15deg);
-    filter: drop-shadow(0 0 15px rgba(0, 100, 255, 0.15)) drop-shadow(0 0 40px rgba(0, 0, 0, 0.6));
+    filter: drop-shadow(0 0 20px rgba(255, 107, 0, 0.08));
     pointer-events: none;
-    transform-style: preserve-3d;
 }
 .muscle-part {
-    stroke: #6a6d80;
-    stroke-width: 1.5;
-    transition: all 0.35s cubic-bezier(0.25, 0.8, 0.25, 1);
+    stroke: #555;
+    stroke-width: 1.2;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
     cursor: pointer;
     pointer-events: auto;
-    transform-style: preserve-3d;
-    transform: translateZ(0);
-    filter: drop-shadow(0 0 2px rgba(255, 255, 255, 0.06));
 }
 .muscle-part:hover {
-    fill: url(#hover-grad);
-    stroke: #5599ff;
-    filter: drop-shadow(0 0 10px rgba(68, 136, 255, 0.6));
-    transform: translateZ(5px) scale(1.06);
+    fill: #333 !important;
+    stroke: var(--neon-orange);
+    filter: drop-shadow(0 0 6px rgba(255, 107, 0, 0.4));
 }
 .muscle-part.active {
-    fill: url(#active-grad);
-    stroke: #ffffff;
-    filter: drop-shadow(0 0 14px rgba(0, 255, 136, 0.9));
-    transform: translateZ(8px) scale(1.08);
-    animation: svg-breathe 2s infinite alternate;
+    fill: var(--neon-orange) !important;
+    stroke: #fff;
+    filter: drop-shadow(0 0 10px rgba(255, 107, 0, 0.6));
+    animation: muscle-breathe 1.2s infinite alternate;
 }
-@keyframes svg-breathe {
-    0% { filter: drop-shadow(0 0 8px rgba(0, 255, 136, 0.5)); opacity: 0.85; }
-    100% { filter: drop-shadow(0 0 22px rgba(0, 255, 136, 1)); opacity: 1; }
+@keyframes muscle-breathe {
+    0%   { filter: drop-shadow(0 0 6px rgba(255, 107, 0, 0.3)); opacity: 0.85; }
+    100% { filter: drop-shadow(0 0 14px rgba(255, 107, 0, 0.8)); opacity: 1; }
 }

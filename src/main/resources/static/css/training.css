@@ -1,187 +1,77 @@
-#trend-chart-container {
-    background: var(--bg-card);
-    border-radius: var(--radius);
-    border: 1px solid var(--border);
-    padding: 20px;
+/* ============================================================
+   IronSync-3D · Training (Glassmorphism)
+   ============================================================ */
+
+.content-grid {
+    display: grid;
+    grid-template-columns: 320px 1fr;
+    gap: 20px;
+    flex: 1;
+    min-height: 0;
 }
+
+#volume-chart-container {
+    margin-top: 16px;
+}
+
+#volumeChart {
+    width: 100%;
+    height: 200px;
+}
+
 #strengthTrendChart {
     width: 100%;
     height: 280px;
 }
 
-.content-grid {
-    display: grid;
-    grid-template-columns: 340px 1fr;
-    gap: 24px;
-    flex: 1;
-    min-height: 0;
-}
-
-.form-panel {
-    background: var(--bg-card);
-    border-radius: var(--radius);
-    border: 1px solid var(--border);
-    padding: 24px;
-}
-.form-panel h3,
-.history-panel h3 {
-    font-size: 14px;
-    color: var(--text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 1px;
-    margin-bottom: 20px;
-}
-
 #trainingForm {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 16px;
+    gap: 14px;
 }
 #trainingForm label {
-    font-size: 12px;
-    color: var(--text-secondary);
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    color: var(--text-muted);
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 5px;
 }
 #trainingForm label:nth-child(5),
 #trainingForm button {
     grid-column: span 2;
 }
 
-#trainingForm select,
-#trainingForm input[type="number"],
-#trainingForm input[type="date"] {
-    background: #2A2A2A;
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 8px 12px;
-    color: var(--text-primary);
-    font-size: 14px;
-    outline: none;
-    transition: border-color 0.2s;
-}
-#trainingForm select:focus,
-#trainingForm input:focus {
-    border-color: var(--accent-blue);
-}
-
 #trainingForm input[type="range"] {
     width: 100%;
-    accent-color: var(--accent-blue);
 }
 .range-val {
     font-size: 14px;
-    color: var(--accent-blue);
-    font-weight: 600;
+    color: var(--neon-orange);
+    font-weight: 700;
+    font-family: var(--font-mono);
 }
 
-#trainingForm button {
-    background: var(--accent-blue);
-    color: #fff;
-    border: none;
-    border-radius: 8px;
-    padding: 10px;
-    font-size: 14px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: opacity 0.2s;
-}
-#trainingForm button:hover {
-    opacity: 0.85;
-}
-
-.history-panel {
-    background: var(--bg-card);
-    border-radius: var(--radius);
-    border: 1px solid var(--border);
-    padding: 24px;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}
-.table-wrap {
-    flex: 1;
-    overflow-y: auto;
-}
-
-#historyTable {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 13px;
-}
-#historyTable th {
-    text-align: left;
-    color: var(--text-secondary);
-    font-weight: 500;
-    padding: 8px 12px;
-    border-bottom: 1px solid var(--border);
-    position: sticky;
-    top: 0;
-    background: var(--bg-card);
-}
-#historyTable td {
-    padding: 8px 12px;
-    border-bottom: 1px solid rgba(255,255,255,0.04);
-    color: var(--text-primary);
-}
-#historyTable tr:hover td {
-    background: rgba(255,255,255,0.03);
+#historyTable th:last-child,
+#historyTable td:last-child {
+    text-align: right;
 }
 
 .delete-btn {
-    background: transparent;
-    border: 1px solid var(--accent-red);
-    color: var(--accent-red);
-    padding: 2px 10px;
-    border-radius: 4px;
+    display: inline;
+    padding: 0;
+    font-family: var(--font-mono);
     font-size: 12px;
+    font-weight: 500;
+    background: none;
+    border: none;
     cursor: pointer;
-    transition: background 0.2s;
+    color: var(--text-muted);
+    transition: color 0.15s;
+    user-select: none;
 }
 .delete-btn:hover {
-    background: rgba(244,67,54,0.15);
-}
-
-.pagination {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 12px 0 4px;
-    border-top: 1px solid var(--border);
-    margin-top: 8px;
-}
-.page-info {
-    font-size: 12px;
-    color: var(--text-secondary);
-}
-.page-btns {
-    display: flex;
-    align-items: center;
-    gap: 4px;
-}
-.page-btn {
-    background: transparent;
-    border: 1px solid var(--border);
-    color: var(--text-secondary);
-    padding: 4px 10px;
-    border-radius: 4px;
-    font-size: 13px;
-    cursor: pointer;
-    transition: all 0.2s;
-    min-width: 32px;
-    text-align: center;
-}
-.page-btn:hover:not(:disabled):not(.active) {
-    border-color: var(--accent-blue);
-    color: var(--accent-blue);
-}
-.page-btn.active {
-    color: #fff;
-    border-color: var(--accent-blue);
-    background: var(--accent-blue);
-}
-.page-btn:disabled {
-    opacity: 0.3;
-    cursor: not-allowed;
+    color: var(--neon-red);
 }

@@ -10,6 +10,9 @@
 
 </head>
 <body>
+    <!-- Floating neon background orb (required by glassmorphism global.css) -->
+    <div id="glass-bg-orb"></div>
+
     <div id="top-bar">
         <div class="logo">IRON<span>SYNC</span> 3D</div>
         <nav>
@@ -54,24 +57,24 @@
     </div>
 
     <div class="glass-card left">
-        <h3>今日训练概览</h3>
-        <div class="stat-item">
-            <span>动作数</span>
+        <div class="card-title">今日训练概览</div>
+        <div class="stat-row">
+            <span class="stat-label">动作数</span>
             <span class="stat-value" id="stat-exercises">--</span>
         </div>
-        <div class="stat-item">
-            <span>总组数</span>
+        <div class="stat-row">
+            <span class="stat-label">总组数</span>
             <span class="stat-value" id="stat-sets">--</span>
         </div>
-        <div class="stat-item">
-            <span>平均 RPE</span>
+        <div class="stat-row">
+            <span class="stat-label">平均 RPE</span>
             <span class="stat-value" id="stat-rpe">--</span>
         </div>
     </div>
 
     <div class="glass-card right">
-        <h3>热量消耗</h3>
-        <div style="position:relative;display:flex;justify-content:center;">
+        <div class="card-title">热量消耗</div>
+        <div class="ring-wrap">
             <div class="ring-progress">
                 <svg viewBox="0 0 120 120">
                     <circle class="bg" cx="60" cy="60" r="50"/>
@@ -84,8 +87,8 @@
                 </div>
             </div>
         </div>
-        <div class="stat-item">
-            <span>目标</span>
+        <div class="stat-row">
+            <span class="stat-label">目标</span>
             <span class="stat-value" id="cal-target">600 kcal</span>
         </div>
     </div>

@@ -1,6 +1,22 @@
 {
-  "timestamp": "--",
-  "total": 0,
-  "passed": 0,
-  "failed": 0
+  "timestamp": "2026-06-14 10:30:00",
+  "total": 12,
+  "passed": 11,
+  "failed": 1,
+  "duration": "2m 34s",
+  "browser": "Chromium",
+  "details": [
+    {"name": "登录流程", "status": "passed"},
+    {"name": "训练记录创建", "status": "passed"},
+    {"name": "训练记录列表", "status": "passed"},
+    {"name": "补剂卡片渲染", "status": "passed"},
+    {"name": "补剂库存更新", "status": "passed"},
+    {"name": "饮食情绪录入", "status": "passed"},
+    {"name": "饮食情绪查询", "status": "passed"},
+    {"name": "身体指标录入", "status": "passed"},
+    {"name": "3D 看板渲染", "status": "passed"},
+    {"name": "SVG 部位高亮", "status": "passed"},
+    {"name": "MCP 日记搜索", "status": "passed"},
+    {"name": "移动端适配", "status": "failed"}
+  ]
 }

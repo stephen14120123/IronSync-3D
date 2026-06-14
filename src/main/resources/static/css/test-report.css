@@ -1,77 +1,88 @@
+/* ============================================================
+   IronSync-3D · Test Report (Glassmorphism)
+   ============================================================ */
+
 .page-container {
-    padding: 80px 32px 32px;
+    padding: 72px 28px 24px;
     display: grid;
-    grid-template-columns: 280px 1fr;
-    gap: 24px;
+    grid-template-columns: 240px 1fr;
+    gap: 20px;
     height: 100vh;
     overflow: hidden;
 }
 
-/* ---- Left Overview ---- */
+/* ---- Left Overview (glass) ---- */
 .overview-panel {
-    background: var(--bg-card);
-    border-radius: var(--radius);
-    border: 1px solid var(--border);
-    padding: 24px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: var(--border-w) solid var(--glass-border);
+    border-radius: var(--radius-card);
+    padding: 20px;
     display: flex;
     flex-direction: column;
-    gap: 20px;
-}
-.overview-panel h3 {
-    font-size: 14px;
-    color: var(--text-secondary);
-    text-transform: uppercase;
-    letter-spacing: 1px;
+    gap: 16px;
 }
 
 .badge-item {
     display: flex;
     justify-content: space-between;
-    font-size: 13px;
-    padding: 8px 0;
-    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+    padding: 6px 0;
+    border-bottom: var(--border-w) solid var(--glass-border);
 }
 .badge-label {
     color: var(--text-secondary);
+    font-size: 11px;
+    letter-spacing: var(--tracking);
 }
 .badge-value {
     color: var(--text-primary);
-    font-weight: 600;
+    font-weight: 700;
+    font-family: var(--font-mono);
+    font-size: 13px;
 }
 
 .badge-row {
     display: flex;
-    gap: 12px;
+    gap: 8px;
 }
-.badge {
+.badge-box {
     flex: 1;
     text-align: center;
-    padding: 16px 8px;
-    border-radius: 8px;
-    border: 1px solid var(--border);
+    padding: 12px 8px;
+    background: var(--glass-bg);
+    backdrop-filter: blur(8px);
+    border: var(--border-w) solid var(--glass-border);
+    border-radius: var(--radius-btn);
 }
 .badge-num {
     display: block;
-    font-size: 28px;
-    font-weight: 700;
+    font-size: 24px;
+    font-weight: 900;
     line-height: 1.2;
+    font-family: var(--font-mono);
 }
 .badge-desc {
-    font-size: 11px;
-    color: var(--text-secondary);
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: var(--tracking-wide);
     text-transform: uppercase;
-    letter-spacing: 0.5px;
+    color: var(--text-muted);
+    margin-top: 4px;
 }
-.status-total .badge-num { color: var(--text-primary); }
-.status-pass .badge-num { color: var(--accent-green); }
-.status-fail .badge-num { color: var(--accent-red); }
+.box-total .badge-num { color: var(--text-primary); }
+.box-pass  .badge-num { color: var(--neon-green); }
+.box-fail  .badge-num { color: var(--neon-red); }
 
-/* ---- Right iframe ---- */
+/* ---- Right iframe (glass) ---- */
 .report-container {
     position: relative;
-    background: var(--bg-card);
-    border-radius: var(--radius);
-    border: 1px solid var(--border);
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: var(--border-w) solid var(--glass-border);
+    border-radius: var(--radius-card);
     overflow: hidden;
 }
 #reportIframe {
@@ -87,21 +98,19 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 8px;
+    gap: 12px;
     color: var(--text-secondary);
-}
-.fallback-icon {
-    font-size: 48px;
-    opacity: 0.4;
 }
 .fallback-text {
-    font-size: 18px;
-    font-weight: 600;
+    font-size: 16px;
+    font-weight: 700;
     color: var(--text-primary);
+    letter-spacing: var(--tracking);
 }
 .fallback-sub {
-    font-size: 13px;
-    color: var(--text-secondary);
+    font-size: 12px;
+    color: var(--text-muted);
     max-width: 280px;
     text-align: center;
+    font-family: var(--font-mono);
 }

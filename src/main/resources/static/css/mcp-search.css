@@ -1,33 +1,32 @@
-.page-container {
-    padding: 80px 32px 32px;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-    height: 100vh;
-    overflow: hidden;
-}
+/* ============================================================
+   IronSync-3D · MCP Search (Glassmorphism)
+   ============================================================ */
 
 /* ---- Terminal-style Search ---- */
 .search-area {
     display: flex;
     align-items: center;
-    background: #0D0D0D;
-    border: 1px solid #333;
-    border-radius: 8px;
-    padding: 12px 18px;
-    font-family: "Fira Code", "Cascadia Code", "Consolas", monospace;
+    background: rgba(0, 0, 0, 0.30);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: var(--border-w) solid var(--glass-border);
+    border-radius: var(--radius-input);
+    padding: 10px 16px;
+    font-family: var(--font-mono);
     transition: border-color 0.2s;
 }
 .search-area:focus-within {
-    border-color: var(--accent-blue);
-    box-shadow: 0 0 12px rgba(33,150,243,0.15);
+    border-color: var(--neon-orange);
 }
 
 .search-prefix {
-    color: var(--accent-green);
-    font-size: 15px;
+    color: var(--neon-green);
+    font-size: 13px;
     margin-right: 12px;
     white-space: nowrap;
+    font-weight: 700;
+    letter-spacing: var(--tracking);
+    user-select: none;
 }
 
 #searchInput {
@@ -36,102 +35,108 @@
     border: none;
     outline: none;
     color: var(--text-primary);
-    font-family: inherit;
-    font-size: 15px;
+    font-family: var(--font-mono);
+    font-size: 13px;
+    padding: 0;
 }
 #searchInput::placeholder {
-    color: #555;
+    color: var(--text-disabled);
 }
 
 /* ---- Main Grid ---- */
 .main-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
-    gap: 20px;
+    gap: 16px;
     flex: 1;
     min-height: 0;
 }
 
 .results-panel, .preview-panel {
-    background: var(--bg-card);
-    border-radius: var(--radius);
-    border: 1px solid var(--border);
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: var(--border-w) solid var(--glass-border);
+    border-radius: var(--radius-card);
     padding: 16px;
     overflow-y: auto;
 }
 
 .placeholder {
-    color: #555;
+    color: var(--text-disabled);
     text-align: center;
     padding: 60px 0;
-    font-size: 14px;
+    font-size: 13px;
+    font-family: var(--font-mono);
 }
 
 /* ---- Result Items ---- */
 .result-item {
-    padding: 14px 16px;
-    border-radius: 8px;
-    border: 1px solid var(--border);
-    margin-bottom: 10px;
+    padding: 12px 14px;
+    border: var(--border-w) solid var(--glass-border);
+    border-radius: var(--radius-btn);
+    margin-bottom: 8px;
     cursor: pointer;
-    transition: background 0.2s, border-color 0.2s;
+    transition: border-color 0.2s, background 0.2s;
 }
 .result-item:hover {
-    background: rgba(255,255,255,0.03);
-    border-color: var(--accent-blue);
+    border-color: var(--glass-border-hover);
+    background: var(--glass-bg-hover);
 }
+
 .result-item .file-path {
-    font-size: 11px;
-    color: #666;
-    font-family: monospace;
+    font-size: 10px;
+    color: var(--text-disabled);
+    font-family: var(--font-mono);
     margin-bottom: 4px;
+    letter-spacing: var(--tracking);
 }
 .result-item .title {
-    font-size: 15px;
-    font-weight: 600;
-    margin-bottom: 6px;
+    font-size: 14px;
+    font-weight: 700;
+    margin-bottom: 4px;
     color: var(--text-primary);
 }
 .result-item .snippet {
-    font-size: 13px;
+    font-size: 12px;
     color: var(--text-secondary);
     line-height: 1.5;
     white-space: pre-wrap;
     word-break: break-all;
 }
 .result-item .snippet mark {
-    background: rgba(33,150,243,0.25);
-    color: var(--accent-blue);
+    background: rgba(255, 107, 0, 0.20);
+    color: var(--neon-orange);
     padding: 0 2px;
-    border-radius: 2px;
 }
 
 /* ---- Preview Panel ---- */
 .preview-panel {
-    font-size: 14px;
+    font-size: 13px;
     line-height: 1.7;
     color: var(--text-primary);
 }
 .preview-panel h1, .preview-panel h2, .preview-panel h3 {
-    margin: 16px 0 8px;
+    margin: 14px 0 6px;
+    font-weight: 700;
     color: var(--text-primary);
 }
-.preview-panel h1 { font-size: 22px; border-bottom: 1px solid var(--border); padding-bottom: 8px; }
-.preview-panel h2 { font-size: 18px; }
-.preview-panel h3 { font-size: 15px; }
-.preview-panel p { margin: 8px 0; }
+.preview-panel h1 { font-size: 20px; border-bottom: var(--border-w) solid var(--glass-border); padding-bottom: 6px; }
+.preview-panel h2 { font-size: 16px; }
+.preview-panel h3 { font-size: 14px; }
+.preview-panel p { margin: 6px 0; }
 .preview-panel code {
-    background: #2A2A2A;
-    padding: 2px 6px;
-    border-radius: 4px;
-    font-size: 13px;
-    font-family: "Fira Code", monospace;
+    background: rgba(0, 0, 0, 0.30);
+    padding: 1px 5px;
+    border-radius: var(--radius-btn);
+    font-size: 12px;
+    font-family: var(--font-mono);
 }
 .preview-panel pre {
-    background: #0D0D0D;
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 16px;
+    background: rgba(0, 0, 0, 0.30);
+    border: var(--border-w) solid var(--glass-border);
+    border-radius: var(--radius-btn);
+    padding: 14px;
     overflow-x: auto;
 }
 .preview-panel pre code {
@@ -139,12 +144,12 @@
     padding: 0;
 }
 .preview-panel ul, .preview-panel ol {
-    padding-left: 24px;
-    margin: 8px 0;
+    padding-left: 20px;
+    margin: 6px 0;
 }
 .preview-panel blockquote {
-    border-left: 3px solid var(--accent-blue);
-    padding-left: 12px;
+    border-left: 3px solid var(--neon-orange);
+    padding-left: 10px;
     color: var(--text-secondary);
-    margin: 8px 0;
+    margin: 6px 0;
 }
