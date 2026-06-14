@@ -29,7 +29,9 @@ public class WebMvcConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(authInterceptor)
+                // 仅拦截 /api/* 路径，静态资源（*.html /css/ /js/ /models/）天然放行
                 .addPathPatterns("/api/**")
+                // 认证相关接口免 Token
                 .excludePathPatterns(
                         "/api/auth/**",
                         "/api/test/db-reset",

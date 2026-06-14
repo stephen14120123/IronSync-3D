@@ -5,6 +5,7 @@ import com.ironsync.common.result.Result;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import org.mindrot.jbcrypt.BCrypt;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
@@ -15,12 +16,12 @@ import java.util.concurrent.ConcurrentHashMap;
 @RequestMapping("/api/auth")
 public class AuthController {
 
-    /** 内置管理员账号 */
+    /** 内置管理员账号 — BCrypt 预哈希值（原始密码: 123456） */
     private static final String ADMIN_USER = "admin";
-    private static final String ADMIN_PASS = "123456";
+    private static final String ADMIN_PASS_HASH = BCrypt.hashpw("123456", BCrypt.gensalt());
 
     /** 注册用户存储（demo 阶段暂存内存，重启即重置） */
-    private final Map<String, String> registeredUsers = new ConcurrentHashMap<>();
+    private final Map<String, String> userHashStore = new ConcurrentHashMap<>();
 
     private final TokenManager tokenManager;
 
@@ -39,11 +40,9 @@ public class AuthController {
             return Result.error(400, "用户名和密码不能为空");
         }
 
-        // 校验：内置管理员 或 已注册用户
-        boolean valid = (ADMIN_USER.equals(username) && ADMIN_PASS.equals(password))
-                     || (password.equals(registeredUsers.get(username)));
-
-        if (!valid) {
+        // 查找该用户存储的密文（内置 admin OR 注册用户）
+        String storedHash = ADMIN_USER.equals(username) ? ADMIN_PASS_HASH : userHashStore.get(username);
+        if (storedHash == null || !BCrypt.checkpw(password, storedHash)) {
             return Result.error(401, "用户名或密码错误");
         }
 
@@ -51,7 +50,7 @@ public class AuthController {
         return Result.success(Map.of("token", token, "username", username));
     }
 
-    @Operation(summary = "注册", description = "注册新用户，用户名不能重复。注册成功后自动返回登录态 Token")
+    @Operation(summary = "注册", description = "注册新用户，密码经 BCrypt 加密后存储")
     @ApiResponse(responseCode = "200", description = "注册成功返回 token")
     @PostMapping("/register")
     public Result<Map<String, String>> register(@RequestBody Map<String, String> body) {
@@ -70,7 +69,10 @@ public class AuthController {
         if (ADMIN_USER.equals(username)) {
             return Result.error(400, "该用户名已被注册");
         }
-        if (registeredUsers.putIfAbsent(username, password) != null) {
+
+        // BCrypt 加密后存入
+        String hashed = BCrypt.hashpw(password, BCrypt.gensalt());
+        if (userHashStore.putIfAbsent(username, hashed) != null) {
             return Result.error(400, "该用户名已被注册");
         }
 

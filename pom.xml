@@ -78,6 +78,13 @@
             <version>2.5.0</version>
         </dependency>
 
+        <!-- jbcrypt 密码加密（零外部依赖，轻量级） -->
+        <dependency>
+            <groupId>org.mindrot</groupId>
+            <artifactId>jbcrypt</artifactId>
+            <version>0.4</version>
+        </dependency>
+
         <!-- Spring Boot Test -->
         <dependency>
             <groupId>org.springframework.boot</groupId>

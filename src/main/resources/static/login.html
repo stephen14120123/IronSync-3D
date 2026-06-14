@@ -305,7 +305,7 @@
                             <label for="loginPass">密码</label>
                             <input type="password" id="loginPass" placeholder="请输入密码">
                         </div>
-                        <button type="submit" class="submit-btn" id="loginBtn">登 录</button>
+                        <button type="submit" class="submit-btn" id="loginBtn" data-original-text="登 录">登 录</button>
                     </form>
                     <div class="msg-box" id="loginMsg"></div>
                     <div class="toggle-link">
@@ -328,7 +328,7 @@
                             <label for="regConfirm">确认密码</label>
                             <input type="password" id="regConfirm" placeholder="再次输入密码">
                         </div>
-                        <button type="submit" class="submit-btn" id="registerBtn">注 册</button>
+                        <button type="submit" class="submit-btn" id="registerBtn" data-original-text="注 册">注 册</button>
                     </form>
                     <div class="msg-box" id="registerMsg"></div>
                     <div class="toggle-link">
@@ -352,28 +352,22 @@
         };
 
         function switchTab(name) {
-            // Update tabs
             tabs.forEach(t => t.classList.toggle('active', t.dataset.tab === name));
-
-            // Update panels
             Object.entries(panels).forEach(([key, el]) => {
                 el.classList.toggle('hidden', key !== name);
             });
-
-            // Clear messages
-            document.getElementById('loginMsg').textContent = '';
-            document.getElementById('registerMsg').textContent = '';
+            clearMsg(document.getElementById('loginMsg'));
+            clearMsg(document.getElementById('registerMsg'));
         }
 
         tabs.forEach(tab => {
             tab.addEventListener('click', () => switchTab(tab.dataset.tab));
         });
-
         document.getElementById('switchToRegister').addEventListener('click', () => switchTab('register'));
         document.getElementById('switchToLogin').addEventListener('click', () => switchTab('login'));
 
         // ============================================================
-        //  Helper: show message
+        //  Helpers
         // ============================================================
         function showMsg(el, msg, type) {
             el.textContent = msg;
@@ -385,12 +379,61 @@
             el.className = 'msg-box';
         }
 
-        // ============================================================
-        //  Helper: set loading
-        // ============================================================
-        function setLoading(btn, loading, text) {
-            btn.disabled = loading;
-            btn.textContent = loading ? '处理中...' : text;
+        /**
+         * 防抖 Loading 控制：
+         *  - 禁用按钮，防止连击
+         *  - 用 data-original-text 存储原始文案，恢复时读取该属性，
+         *    不依赖代码中写死的字符串
+         */
+        function setLoading(btn, loading) {
+            if (loading) {
+                if (!btn.dataset.originalText) {
+                    btn.dataset.originalText = btn.textContent;
+                }
+                btn.disabled = true;
+                btn.textContent = '处理中...';
+            } else {
+                btn.disabled = false;
+                btn.textContent = btn.dataset.originalText || '提交';
+            }
+        }
+
+        /**
+         * 统一请求包装：
+         *  1. 发起 fetch
+         *  2. 无论 HTTP 状态码，均尝试解析 Result JSON 包
+         *  3. 只有 json.code === 200 才算成功 → 返回 json.data
+         *  4. 否则将 json.message 抛到调用方显示
+         */
+        async function authRequest(url, body, msgEl, submitBtn) {
+            setLoading(submitBtn, true);
+            clearMsg(msgEl);
+
+            try {
+                const res = await fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(body)
+                });
+
+                let json;
+                try {
+                    json = await res.json();
+                } catch (_) {
+                    throw new Error('服务器返回了非 JSON 响应，请稍后重试');
+                }
+
+                if (json && json.code === 200) {
+                    return json.data;
+                }
+
+                throw new Error(json && json.message ? json.message : '请求失败');
+            } catch (err) {
+                showMsg(msgEl, err.message || '网络异常，请检查服务器是否运行', 'error');
+                return null;
+            } finally {
+                setLoading(submitBtn, false);
+            }
         }
 
         // ============================================================
@@ -402,49 +445,22 @@
 
         loginForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            clearMsg(loginMsg);
 
             const username = document.getElementById('loginUser').value.trim();
-            const password = document.getElementById('loginPass').value.trim();
+            const password = document.getElementById('loginPass').value;
 
             if (!username || !password) {
                 showMsg(loginMsg, '请输入用户名和密码', 'error');
                 return;
             }
 
-            setLoading(loginBtn, true, '登 录');
+            const data = await authRequest('/api/auth/login', { username, password }, loginMsg, loginBtn);
+            if (!data) return;
 
-            try {
-                const res = await fetch('/api/auth/login', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, password })
-                });
-
-                // Try to parse JSON even on non-2xx status
-                let json;
-                try { json = await res.json(); } catch (_) {
-                    showMsg(loginMsg, '服务器返回异常，请稍后重试', 'error');
-                    setLoading(loginBtn, false, '登 录');
-                    return;
-                }
-
-                if (json.code === 200) {
-                    // Store token — use 'auth_token' for compatibility with api.js
-                    localStorage.setItem('auth_token', json.data.token);
-                    // Also store user info for display
-                    localStorage.setItem('auth_user', json.data.username);
-
-                    showMsg(loginMsg, '登录成功，正在跳转...', 'success');
-                    setTimeout(() => { window.location.href = '/'; }, 400);
-                } else {
-                    showMsg(loginMsg, json.message || '登录失败', 'error');
-                    setLoading(loginBtn, false, '登 录');
-                }
-            } catch (err) {
-                showMsg(loginMsg, '网络异常，请检查服务器是否运行', 'error');
-                setLoading(loginBtn, false, '登 录');
-            }
+            localStorage.setItem('auth_token', data.token);
+            localStorage.setItem('auth_user', data.username);
+            showMsg(loginMsg, '登录成功，正在跳转...', 'success');
+            setTimeout(() => { window.location.href = '/'; }, 400);
         });
 
         // ============================================================
@@ -456,13 +472,11 @@
 
         registerForm.addEventListener('submit', async (e) => {
             e.preventDefault();
-            clearMsg(registerMsg);
 
             const username = document.getElementById('regUser').value.trim();
             const password = document.getElementById('regPass').value;
             const confirm = document.getElementById('regConfirm').value;
 
-            // Client-side validation
             if (!username || !password || !confirm) {
                 showMsg(registerMsg, '请填写所有字段', 'error');
                 return;
@@ -480,43 +494,18 @@
                 return;
             }
 
-            setLoading(registerBtn, true, '注 册');
+            const data = await authRequest('/api/auth/register', { username, password }, registerMsg, registerBtn);
+            if (!data) return;
 
-            try {
-                const res = await fetch('/api/auth/register', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ username, password })
-                });
-
-                let json;
-                try { json = await res.json(); } catch (_) {
-                    showMsg(registerMsg, '服务器返回异常，请稍后重试', 'error');
-                    setLoading(registerBtn, false, '注 册');
-                    return;
-                }
-
-                if (json.code === 200) {
-                    // Auto-login after registration
-                    localStorage.setItem('auth_token', json.data.token);
-                    localStorage.setItem('auth_user', json.data.username);
-
-                    showMsg(registerMsg, '注册成功！正在跳转...', 'success');
-                    setTimeout(() => { window.location.href = '/'; }, 400);
-                } else {
-                    showMsg(registerMsg, json.message || '注册失败', 'error');
-                    setLoading(registerBtn, false, '注 册');
-                }
-            } catch (err) {
-                showMsg(registerMsg, '网络异常，请检查服务器是否运行', 'error');
-                setLoading(registerBtn, false, '注 册');
-            }
+            localStorage.setItem('auth_token', data.token);
+            localStorage.setItem('auth_user', data.username);
+            showMsg(registerMsg, '注册成功！正在跳转...', 'success');
+            setTimeout(() => { window.location.href = '/'; }, 400);
         });
 
         // ============================================================
-        //  Enter key support: switch tab in register shows "already have account"
+        //  Demo hint in placeholder
         // ============================================================
-        // Pre-fill login demo hint
         document.getElementById('loginUser').placeholder = 'admin';
         document.getElementById('loginPass').placeholder = '123456';
     </script>
