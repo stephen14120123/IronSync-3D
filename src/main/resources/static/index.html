@@ -3,97 +3,241 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IronSync-3D 智能健身看板</title>
+    <title>IronSync-3D · 智能健身仪表盘</title>
 
     <link rel="stylesheet" href="css/global.css">
     <link rel="stylesheet" href="css/dashboard.css">
-
 </head>
 <body>
-    <!-- Floating neon background orb (required by glassmorphism global.css) -->
+
+    <!-- ===== Floating neon background orbs (from global.css) ===== -->
     <div id="glass-bg-orb"></div>
 
+    <!-- ===== TOP NAVBAR ===== -->
     <div id="top-bar">
-        <div class="logo">IRON<span>SYNC</span> 3D</div>
+        <div class="logo">IRON<span>SYNC</span> <small class="logo-dot">⏺</small></div>
         <nav>
             <a href="/" class="active">仪表盘</a>
-            <a href="/training.html">训练记录</a>
-            <a href="/supplements.html">补剂管家</a>
-            <a href="/diet-mood.html">饮食情绪</a>
-            <a href="/body-metrics.html">身体指标</a>
-            <a href="/mcp-search.html">日记检索</a>
-            <a href="/test-report.html">测试报告</a>
+            <a href="/training.html">训练</a>
+            <a href="/body-metrics.html">指标</a>
+            <a href="/diet-mood.html">饮食</a>
+            <a href="/supplements.html">补剂</a>
         </nav>
-    </div>
-
-    <div id="body-svg-overlay" class="tech-body-container">
-        <svg viewBox="0 0 200 350" xmlns="http://www.w3.org/2000/svg" class="tech-body-svg">
-            <defs>
-                <!-- Top-left light source gradient: lighter top-left, darker bottom-right -->
-                <linearGradient id="metal-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stop-color="#4a4d5e" />
-                    <stop offset="100%" stop-color="#1e2028" />
-                </linearGradient>
-                <linearGradient id="hover-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stop-color="#5599ff" />
-                    <stop offset="100%" stop-color="#2244aa" />
-                </linearGradient>
-                <linearGradient id="active-grad" x1="0%" y1="0%" x2="100%" y2="100%">
-                    <stop offset="0%" stop-color="#00ff88" />
-                    <stop offset="100%" stop-color="#008855" />
-                </linearGradient>
-            </defs>
-            <rect x="85" y="20" width="30" height="35" rx="8" data-mesh="Head" class="muscle-part" fill="url(#metal-grad)" />
-            <polygon points="90,58 110,58 105,70 95,70" class="muscle-part core-frame" fill="url(#metal-grad)" />
-            <polygon points="98,75 50,75 60,120 98,130" data-mesh="Chest" class="muscle-part" fill="url(#metal-grad)" />
-            <polygon points="102,75 150,75 140,120 102,130" data-mesh="Chest" class="muscle-part" fill="url(#metal-grad)" />
-            <polygon points="62,125 138,125 125,200 75,200" data-mesh="Abdominal" class="muscle-part" fill="url(#metal-grad)" />
-            <polygon points="45,75 20,150 35,155 55,120" data-mesh="LeftArm" class="muscle-part" fill="url(#metal-grad)" />
-            <polygon points="155,75 180,150 165,155 145,120" data-mesh="RightArm" class="muscle-part" fill="url(#metal-grad)" />
-            <polygon points="70,205 40,320 65,320 95,215" data-mesh="Quad_L" class="muscle-part" fill="url(#metal-grad)" />
-            <polygon points="130,205 160,320 135,320 105,215" data-mesh="Quad_R" class="muscle-part" fill="url(#metal-grad)" />
-            <line x1="100" y1="75" x2="100" y2="200" stroke="#333" stroke-width="2" pointer-events="none" />
-        </svg>
-    </div>
-
-    <div class="glass-card left">
-        <div class="card-title">今日训练概览</div>
-        <div class="stat-row">
-            <span class="stat-label">动作数</span>
-            <span class="stat-value" id="stat-exercises">--</span>
-        </div>
-        <div class="stat-row">
-            <span class="stat-label">总组数</span>
-            <span class="stat-value" id="stat-sets">--</span>
-        </div>
-        <div class="stat-row">
-            <span class="stat-label">平均 RPE</span>
-            <span class="stat-value" id="stat-rpe">--</span>
+        <div class="nav-right">
+            <span class="nav-user" id="navUser">—</span>
+            <button class="btn-logout" id="btnLogout" title="退出登录">↩ 退出</button>
         </div>
     </div>
 
-    <div class="glass-card right">
-        <div class="card-title">热量消耗</div>
-        <div class="ring-wrap">
-            <div class="ring-progress">
-                <svg viewBox="0 0 120 120">
-                    <circle class="bg" cx="60" cy="60" r="50"/>
-                    <circle class="fg" cx="60" cy="60" r="50"
-                        id="cal-ring" stroke-dasharray="314.16" stroke-dashoffset="314.16"/>
-                </svg>
-                <div class="center-label">
-                    <span id="cal-current">0</span>
-                    <small>kcal</small>
+    <!-- ===== BENTO BOX DASHBOARD ===== -->
+    <div class="page-container bento-page">
+
+        <!-- ── Row 1: Greeting (2 cols) + Training (1 col) + Body Metrics (1 col) ── -->
+        <div class="bento-grid bento-row-span-2">
+
+            <!-- Card 1: 今日概览 (large, spans 2 rows) + 个人统计 -->
+            <div class="bento-card card-greeting" id="cardGreeting">
+                <div class="greeting-inner">
+
+                    <!-- Left: greeting -->
+                    <div class="greeting-left">
+                        <div class="greeting-time" id="greetingTime">--:--</div>
+                        <div class="greeting-text" id="greetingText">加载中...</div>
+                        <div class="greeting-date" id="greetingDate">——</div>
+                        <div class="greeting-mood" id="greetingMood">
+                            <span class="mood-label">今天状态</span>
+                            <span class="mood-options">
+                                <button class="mood-btn" data-score="10" title="非常好">😄</button>
+                                <button class="mood-btn" data-score="7" title="还不错">🙂</button>
+                                <button class="mood-btn" data-score="5" title="一般般">😐</button>
+                                <button class="mood-btn" data-score="2" title="不太好">😞</button>
+                            </span>
+                            <span class="mood-result" id="moodResult"></span>
+                        </div>
+                        <div class="greeting-motto">每一次努力，都是对自己的重塑</div>
+                    </div>
+
+                    <!-- Right: personal stats -->
+                    <div class="greeting-stats" id="profileStats">
+                        <div class="stats-identity">
+                            <span class="stats-avatar" id="statsAvatar">A</span>
+                            <div>
+                                <div class="stats-name" id="statsName">—</div>
+                            </div>
+                        </div>
+                        <div class="stats-divider"></div>
+                        <div class="stats-grid">
+                            <div class="stats-item">
+                                <span class="stats-num" id="ps-workouts">--</span>
+                                <span class="stats-lbl">训练次数</span>
+                            </div>
+                            <div class="stats-item">
+                                <span class="stats-num" id="ps-sets">--</span>
+                                <span class="stats-lbl">总组数</span>
+                            </div>
+                            <div class="stats-item">
+                                <span class="stats-num" id="ps-volume">--</span>
+                                <span class="stats-lbl">总容量</span>
+                            </div>
+                            <div class="stats-item">
+                                <span class="stats-num" id="ps-calories">--</span>
+                                <span class="stats-lbl">消耗</span>
+                            </div>
+                        </div>
+                        <div class="stats-body" id="statsBodyRow">
+                            <!-- filled by JS: weight / bodyfat with deltas -->
+                        </div>
+                    </div>
+
                 </div>
             </div>
+
+            <!-- Card 2: 核心训练 (medium) -->
+            <div class="bento-card card-training" id="cardTraining">
+                <div class="card-header">
+                    <span class="card-dot"></span>
+                    核心力量
+                </div>
+                <div class="training-metrics">
+                    <div class="training-item">
+                        <span class="training-label">深蹲</span>
+                        <span class="training-value" id="ts-squat">--</span>
+                        <span class="training-unit">kg 本周</span>
+                    </div>
+                    <div class="training-item">
+                        <span class="training-label">罗马尼亚硬拉</span>
+                        <span class="training-value" id="ts-rdl">--</span>
+                        <span class="training-unit">kg 本周</span>
+                    </div>
+                    <div class="training-item">
+                        <span class="training-label">本周训练</span>
+                        <span class="training-value" id="ts-frequency">--</span>
+                        <span class="training-unit">次</span>
+                    </div>
+                </div>
+                <div class="training-mini-bar" id="trainingMiniBar">
+                    <div class="mini-bar-track">
+                        <div class="mini-bar-fill" id="miniBarFill" style="width:0%"></div>
+                    </div>
+                    <span class="mini-bar-label">本周进度</span>
+                </div>
+            </div>
+
+            <!-- Card 3: 本周容量趋势 (medium) -->
+            <div class="bento-card card-capacity" id="cardCapacity">
+                <div class="card-header">
+                    <span class="card-dot"></span>
+                    本周容量趋势
+                </div>
+                <div class="capacity-bars" id="capacityBars">
+                    <!-- filled by JS: 7 day bars -->
+                </div>
+                <div class="capacity-footer">
+                    <span class="capacity-total">本周总容量 <strong id="capTotal">--</strong></span>
+                </div>
+            </div>
+
+            <!-- Card 4: 补剂余量 (below 核心训练) -->
+            <div class="bento-card card-supplement-mini" id="cardSupplements">
+                <div class="card-header">
+                    <span class="card-dot"></span>
+                    补剂余量
+                </div>
+                <div class="sup-mini-list" id="supMiniList">
+                    <div class="sup-mini-placeholder">暂无补剂</div>
+                </div>
+            </div>
+
+            <!-- Card 5: 今日饮食 (below 容量趋势) -->
+            <div class="bento-card card-diet-mini" id="cardDietMood">
+                <div class="card-header">
+                    <span class="card-dot"></span>
+                    今日饮食
+                </div>
+                <div class="diet-mini-body" id="dietMiniBody">
+                    <div class="diet-mini-placeholder">暂无记录</div>
+                </div>
+            </div>
+
         </div>
-        <div class="stat-row">
-            <span class="stat-label">目标</span>
-            <span class="stat-value" id="cal-target">600 kcal</span>
+
+        <!-- ── Row 2: Quick Actions (full width) ── -->
+        <div class="bento-grid bento-row-1">
+
+            <!-- Card 6: 快捷操作 (horizontal) -->
+            <div class="bento-card card-actions">
+                <div class="card-header">
+                    <span class="card-dot"></span>
+                    快捷操作
+                </div>
+                <div class="actions-grid">
+                    <a href="/training.html" class="action-btn">
+                        <span class="action-icon">⌖</span>
+                        <span class="action-text">添加训练</span>
+                    </a>
+                    <a href="/diet-mood.html" class="action-btn">
+                        <span class="action-icon">◈</span>
+                        <span class="action-text">饮食记录</span>
+                    </a>
+                    <a href="/body-metrics.html" class="action-btn">
+                        <span class="action-icon">◉</span>
+                        <span class="action-text">身体指标</span>
+                    </a>
+                    <a href="/supplements.html" class="action-btn">
+                        <span class="action-icon">◇</span>
+                        <span class="action-text">补剂管理</span>
+                    </a>
+                    <a href="/mcp-search.html" class="action-btn">
+                        <span class="action-icon">◎</span>
+                        <span class="action-text">日记检索</span>
+                    </a>
+                </div>
+            </div>
+
         </div>
+
+        <!-- ── Row 3: 今日消耗 + 近 7 日消耗趋势 ── -->
+        <div class="bento-grid bento-row-bottom">
+
+            <!-- Card 7: 今日消耗 -->
+            <div class="bento-card card-calories">
+                <div class="card-header">
+                    <span class="card-dot"></span>
+                    今日消耗
+                </div>
+                <div class="calories-display">
+                    <span class="calories-number" id="calNumber">0</span>
+                    <span class="calories-unit">kcal</span>
+                </div>
+                <div class="calories-bar">
+                    <div class="cal-bar-track">
+                        <div class="cal-bar-fill" id="calBarFill" style="width:0%"></div>
+                    </div>
+                    <span class="cal-bar-label" id="calBarLabel">0 / 600 kcal</span>
+                </div>
+            </div>
+
+            <!-- Card 8: 近 7 日消耗趋势 -->
+            <div class="bento-card card-weekly-cal">
+                <div class="card-header">
+                    <span class="card-dot"></span>
+                    近 7 日消耗趋势
+                </div>
+                <div class="weekly-cal-bars" id="weeklyCalBars">
+                    <!-- filled by JS -->
+                </div>
+                <div class="weekly-cal-footer">
+                    <span class="weekly-cal-total">7 日共 <strong id="weeklyCalTotal">--</strong> kcal</span>
+                    <span class="weekly-cal-avg">日均 -- kcal</span>
+                </div>
+            </div>
+
+        </div>
+
     </div>
 
-    <div id="hint-overlay">点击身体部位查看详情</div>
+    <!-- ===== Toast container ===== -->
+    <div class="toast-wrap"></div>
 
     <script src="js/api.js"></script>
     <script src="js/dashboard.js"></script>

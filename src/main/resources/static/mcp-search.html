@@ -10,29 +10,38 @@
 <body>
     <div id="glass-bg-orb"></div>
     <div id="top-bar">
-        <div class="logo">IRON<span>SYNC</span> 3D</div>
+        <div class="logo">IRON<span>SYNC</span> <small class="logo-dot">⏺</small></div>
         <nav>
             <a href="/">仪表盘</a>
-            <a href="/training.html">训练记录</a>
-            <a href="/supplements.html">补剂管家</a>
-            <a href="/diet-mood.html">饮食情绪</a>
-            <a href="/body-metrics.html">身体指标</a>
-            <a href="/mcp-search.html" class="active">日记检索</a>
-            <a href="/test-report.html">测试报告</a>
+            <a href="/training.html">训练</a>
+            <a href="/body-metrics.html">指标</a>
+            <a href="/diet-mood.html">饮食</a>
+            <a href="/supplements.html">补剂</a>
+            <a href="/mcp-search.html" class="active">日记</a>
         </nav>
+        <div class="nav-right">
+            <span class="nav-user" id="navUser">—</span>
+            <button class="btn-logout" id="btnLogout" title="退出登录">↩ 退出</button>
+        </div>
     </div>
 
     <div class="page-container">
-        <div class="search-area">
-            <span class="search-prefix">$ search&gt;</span>
-            <input type="text" id="searchInput" placeholder="输入关键词搜索本地 Markdown 笔记...">
+        <div class="search-bar">
+            <div class="search-area">
+                <span class="search-prefix">$ search &gt;</span>
+                <input type="text" id="searchInput" placeholder="输入关键词搜索本地 Markdown 笔记...">
+            </div>
+            <button class="btn btn-primary" id="searchBtn">检 索</button>
         </div>
 
         <div class="main-grid">
             <div class="results-panel" id="resultsPanel">
-                <div class="placeholder">输入关键词开始检索</div>
+                <div class="panel-header">RESULTS</div>
+                <div class="placeholder" id="resultsPlaceholder">输入关键词开始检索</div>
+                <div id="resultsList"></div>
             </div>
             <div class="preview-panel" id="previewPanel">
+                <div class="panel-header">PREVIEW</div>
                 <div class="placeholder">选择一条结果查看内容</div>
             </div>
         </div>

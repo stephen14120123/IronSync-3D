@@ -6,7 +6,7 @@
     <title>营养与补剂管家 — IronSync-3D</title>
     <link rel="stylesheet" href="css/global.css">
     <link rel="stylesheet" href="css/supplement.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
+    <script src="js/echarts.min.js"></script>
     <style>
         #supplement-chart-container { margin-bottom: 20px; }
         #supplementChart { width: 100%; height: 200px; }
@@ -15,16 +15,18 @@
 <body>
     <div id="glass-bg-orb"></div>
     <div id="top-bar">
-        <div class="logo">IRON<span>SYNC</span> 3D</div>
+        <div class="logo">IRON<span>SYNC</span> <small class="logo-dot">⏺</small></div>
         <nav>
             <a href="/">仪表盘</a>
-            <a href="/training.html">训练记录</a>
-            <a href="/supplements.html" class="active">补剂管家</a>
-            <a href="/diet-mood.html">饮食情绪</a>
-            <a href="/body-metrics.html">身体指标</a>
-            <a href="/mcp-search.html">日记检索</a>
-            <a href="/test-report.html">测试报告</a>
+            <a href="/training.html">训练</a>
+            <a href="/body-metrics.html">指标</a>
+            <a href="/diet-mood.html">饮食</a>
+            <a href="/supplements.html" class="active">补剂</a>
         </nav>
+        <div class="nav-right">
+            <span class="nav-user" id="navUser">—</span>
+            <button class="btn-logout" id="btnLogout" title="退出登录">↩ 退出</button>
+        </div>
     </div>
 
     <div class="page-container">
@@ -33,7 +35,7 @@
         </div>
         <div class="toolbar">
             <input type="text" id="searchInput" placeholder="搜索补剂名称..." class="search-box">
-            <button id="addBtn" class="btn-primary">+ 新增补剂</button>
+            <button id="addBtn" class="btn btn-primary">+ 新增补剂</button>
         </div>
         <div class="card-grid" id="supplementGrid"></div>
     </div>
@@ -54,8 +56,8 @@
                     <input type="number" name="dailyConsumptionG" step="0.01" min="0.01" required>
                 </label>
                 <div class="modal-actions">
-                    <button type="button" id="modalCancel" class="btn-secondary">取消</button>
-                    <button type="submit" class="btn-primary">保存</button>
+                    <button type="button" id="modalCancel" class="btn btn-ghost">取消</button>
+                    <button type="submit" class="btn btn-primary">保存</button>
                 </div>
             </form>
         </div>

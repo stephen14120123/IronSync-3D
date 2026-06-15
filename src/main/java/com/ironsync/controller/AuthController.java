@@ -1,5 +1,6 @@
 package com.ironsync.controller;
 
+import com.ironsync.common.auth.CurrentUser;
 import com.ironsync.common.auth.TokenManager;
 import com.ironsync.common.result.Result;
 import io.swagger.v3.oas.annotations.Operation;
@@ -76,7 +77,21 @@ public class AuthController {
             return Result.error(400, "该用户名已被注册");
         }
 
+        // 分配 userId
+        CurrentUser.assignId(username);
+
         String token = tokenManager.createToken(username);
         return Result.success(Map.of("token", token, "username", username));
+    }
+
+    @Operation(summary = "退出登录", description = "作废当前 Token，服务端清除凭证")
+    @ApiResponse(responseCode = "200", description = "退出成功")
+    @PostMapping("/logout")
+    public Result<Void> logout(@RequestHeader("Authorization") String authHeader) {
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String token = authHeader.substring(7);
+            tokenManager.removeToken(token);
+        }
+        return Result.success();
     }
 }

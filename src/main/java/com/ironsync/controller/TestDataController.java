@@ -33,6 +33,7 @@ public class TestDataController {
         try {
             jdbcTemplate.execute("TRUNCATE TABLE body_metrics");
             jdbcTemplate.execute("TRUNCATE TABLE diet_mood");
+            jdbcTemplate.execute("TRUNCATE TABLE mood_record");
             jdbcTemplate.execute("TRUNCATE TABLE supplement");
             jdbcTemplate.execute("TRUNCATE TABLE training_record");
             jdbcTemplate.execute("TRUNCATE TABLE user_profile");

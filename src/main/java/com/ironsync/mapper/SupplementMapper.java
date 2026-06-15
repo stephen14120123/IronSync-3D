@@ -2,6 +2,7 @@ package com.ironsync.mapper;
 
 import com.ironsync.entity.Supplement;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Param;
 
 import java.util.List;
 
@@ -16,5 +17,5 @@ public interface SupplementMapper {
 
     int deleteById(Long id);
 
-    List<Supplement> selectAll();
+    List<Supplement> selectAll(@Param("userId") Long userId);
 }

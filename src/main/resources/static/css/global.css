@@ -568,6 +568,113 @@ table tr:hover td {
     border-bottom-color: var(--neon-orange);
 }
 
+/* ---- Nav right: user + logout ---- */
+#top-bar .nav-right {
+    margin-left: auto;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+}
+
+#top-bar .nav-user {
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: var(--text-muted);
+    font-family: var(--font-mono);
+}
+
+#top-bar .logo-dot {
+    font-size: 9px;
+    color: var(--neon-cyan);
+    margin-left: 2px;
+    opacity: 0.7;
+}
+
+/* ---- Logout button ---- */
+.btn-logout {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 6px 14px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    font-family: var(--font-sans);
+    color: var(--text-muted);
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    user-select: none;
+}
+
+.btn-logout:hover {
+    color: #FF6B6B;
+    background: rgba(255, 107, 107, 0.08);
+    border-color: rgba(255, 107, 107, 0.25);
+    box-shadow: 0 0 16px rgba(255, 107, 107, 0.08);
+}
+
+.btn-logout:active {
+    transform: scale(0.96);
+}
+
+/* ============================================================
+   STAT ROW  —  shared summary blocks (metrics, diet, etc.)
+   ============================================================ */
+.stat-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr 1fr;
+    gap: 14px;
+}
+
+.stat-block {
+    background: var(--glass-bg);
+    backdrop-filter: blur(var(--glass-blur));
+    -webkit-backdrop-filter: blur(var(--glass-blur));
+    border: var(--border-w) solid var(--glass-border);
+    border-radius: var(--radius-card);
+    padding: 18px 16px;
+    text-align: center;
+    transition: border-color 0.2s;
+}
+.stat-block:hover {
+    border-color: var(--glass-border-hover);
+}
+
+.stat-block .num {
+    display: block;
+    font-size: 28px;
+    font-weight: 900;
+    font-family: var(--font-mono);
+    line-height: 1.1;
+    letter-spacing: -1px;
+}
+.stat-block .label {
+    display: block;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    color: var(--text-muted);
+    margin-top: 6px;
+}
+.stat-block .sub {
+    display: block;
+    font-size: 10px;
+    font-family: var(--font-mono);
+    color: var(--text-disabled);
+    margin-top: 2px;
+}
+
+.stat-block.block-total .num { color: var(--text-primary); }
+.stat-block.block-pass .num { color: var(--neon-green); }
+.stat-block.block-fail .num { color: var(--neon-red); }
+.stat-block.block-time .num { color: var(--neon-cyan); }
+.stat-block.block-amber .num { color: var(--neon-amber); }
 
 /* ============================================================
    PAGE LAYOUT

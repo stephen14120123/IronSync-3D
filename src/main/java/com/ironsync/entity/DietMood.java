@@ -19,6 +19,5 @@ public class DietMood {
     private BigDecimal carbsG;
     private BigDecimal proteinG;
     private BigDecimal fatG;
-    private Integer moodScore;
     private String note;
 }

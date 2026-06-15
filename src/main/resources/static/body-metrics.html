@@ -6,24 +6,49 @@
     <title>身体指标 — IronSync-3D</title>
     <link rel="stylesheet" href="css/global.css">
     <link rel="stylesheet" href="css/body-metrics.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
+    <script src="js/echarts.min.js"></script>
 </head>
 <body>
     <div id="glass-bg-orb"></div>
     <div id="top-bar">
-        <div class="logo">IRON<span>SYNC</span> 3D</div>
+        <div class="logo">IRON<span>SYNC</span> <small class="logo-dot">⏺</small></div>
         <nav>
             <a href="/">仪表盘</a>
-            <a href="/training.html">训练记录</a>
-            <a href="/supplements.html">补剂管家</a>
-            <a href="/diet-mood.html">饮食情绪</a>
-            <a href="/body-metrics.html" class="active">身体指标</a>
-            <a href="/mcp-search.html">日记检索</a>
-            <a href="/test-report.html">测试报告</a>
+            <a href="/training.html">训练</a>
+            <a href="/body-metrics.html" class="active">指标</a>
+            <a href="/diet-mood.html">饮食</a>
+            <a href="/supplements.html">补剂</a>
         </nav>
+        <div class="nav-right">
+            <span class="nav-user" id="navUser">—</span>
+            <button class="btn-logout" id="btnLogout" title="退出登录">↩ 退出</button>
+        </div>
     </div>
 
     <div class="page-container">
+        <div class="stat-row" id="metricsStatRow">
+            <div class="stat-block block-total">
+                <span class="num" id="ms-latestWeight">--</span>
+                <span class="label">最新体重</span>
+                <span class="sub" id="ms-weightDelta">--</span>
+            </div>
+            <div class="stat-block block-pass">
+                <span class="num" id="ms-latestBodyfat">--</span>
+                <span class="label">最新体脂</span>
+                <span class="sub" id="ms-bodyfatDelta">--</span>
+            </div>
+            <div class="stat-block block-time">
+                <span class="num" id="ms-totalRecords">--</span>
+                <span class="label">记录天数</span>
+                <span class="sub" id="ms-dateRange">--</span>
+            </div>
+            <div class="stat-block block-amber">
+                <span class="num" id="ms-weightChange">--</span>
+                <span class="label">体重变化</span>
+                <span class="sub">较 7 天前</span>
+            </div>
+        </div>
+
         <div id="chart-container">
             <div id="bodyMetricsChart"></div>
         </div>
@@ -44,7 +69,10 @@
                     <label>备注
                         <input type="text" name="note" maxlength="500">
                     </label>
-                    <button type="submit">保存</button>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary" id="metricsSubmitBtn">保存</button>
+                        <button type="button" class="btn btn-ghost" id="metricsCancelBtn" style="display:none" onclick="cancelEdit()">取消编辑</button>
+                    </div>
                 </form>
             </div>
 

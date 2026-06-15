@@ -46,6 +46,7 @@
     <select id="selectAll" resultMap="BaseResultMap">
         SELECT <include refid="BaseColumns"/>
         FROM supplement
+        WHERE user_id = #{userId}
         ORDER BY created_at ASC
     </select>
 

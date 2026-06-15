@@ -5,6 +5,7 @@ let currentPage = 1;
 let pageSize = 10;
 let totalPages = 0;
 let totalRecords = 0;
+let editingId = null;
 
 function initChart() {
     const dom = document.getElementById('strengthTrendChart');
@@ -20,19 +21,24 @@ function epley1rm(weight, reps) {
 function renderChart(records) {
     if (!chart) return;
 
-    // GroupBy action_name
+    // GroupBy action_name + date, take max 1RM per day
     const map = {};
     for (const r of records) {
-        if (!map[r.actionName]) map[r.actionName] = [];
+        const key = r.actionName + '||' + r.recordDate;
         const est1rm = epley1rm(r.weightKg, r.reps);
-        map[r.actionName].push({ date: r.recordDate, est1rm });
+        if (!map[r.actionName]) map[r.actionName] = {};
+        if (!map[r.actionName][r.recordDate] || est1rm > map[r.actionName][r.recordDate]) {
+            map[r.actionName][r.recordDate] = est1rm;
+        }
     }
 
     const colors = ['#F44336', '#2196F3', '#4CAF50', '#FF9800', '#9C27B0'];
     let ci = 0;
 
-    const series = Object.entries(map).map(([name, pts]) => {
-        pts.sort((a, b) => a.date.localeCompare(b.date));
+    const series = Object.entries(map).map(([name, dayMap]) => {
+        const pts = Object.entries(dayMap)
+            .map(([date, est1rm]) => ({ date, est1rm }))
+            .sort((a, b) => a.date.localeCompare(b.date));
         const color = colors[ci++ % colors.length];
         return {
             name,
@@ -80,21 +86,40 @@ function renderChart(records) {
     }, true);
 }
 
+/**
+ * XSS-安全的表格渲染
+ * 使用 escapeHTML() 转义所有后端返回的字符串，
+ * 防止恶意数据注入 innerHTML。
+ */
 function renderTable(records) {
     const tbody = document.getElementById('historyBody');
     const sorted = [...records].sort((a, b) => b.recordDate.localeCompare(a.recordDate));
     tbody.innerHTML = sorted.map(r => `
         <tr>
-            <td>${r.recordDate}</td>
-            <td>${r.actionName}</td>
-            <td>${r.weightKg}</td>
-            <td>${r.sets}×${r.reps}</td>
-            <td>${r.rpe}</td>
-            <td><button class="delete-btn" data-id="${r.id}">删除</button></td>
+            <td>${escapeHTML(r.recordDate)}</td>
+            <td>${escapeHTML(r.actionName)}</td>
+            <td>${r.actionName === '引体向上' ? (r.weightKg == 0 ? '自重' : escapeHTML(r.weightKg) + 'kg') : escapeHTML(r.weightKg)}</td>
+            <td>${escapeHTML(r.sets)}×${escapeHTML(r.reps)}</td>
+            <td>${escapeHTML(r.rpe)}</td>
+            <td>
+                <button class="text-btn" data-id="${escapeHTML(r.id)}">[ 编辑 ]</button>
+                <button class="text-btn danger" data-id="${escapeHTML(r.id)}">[ 删除 ]</button>
+            </td>
         </tr>
     `).join('');
 
-    tbody.querySelectorAll('.delete-btn').forEach(btn => {
+    // Edit buttons
+    tbody.querySelectorAll('.text-btn:not(.danger)').forEach(btn => {
+        btn.addEventListener('click', () => {
+            const id = parseInt(btn.dataset.id);
+            const record = allRecords.find(r => r.id === id);
+            if (!record) return;
+            startEdit(record);
+        });
+    });
+
+    // Delete buttons
+    tbody.querySelectorAll('.text-btn.danger').forEach(btn => {
         btn.addEventListener('click', async () => {
             try {
                 await api.del('/training-records/' + btn.dataset.id);
@@ -167,22 +192,91 @@ async function loadChart() {
     } catch (_) {}
 }
 
+// ---- Start editing a record ----
+function startEdit(record) {
+    editingId = record.id;
+
+    var select = document.getElementById('actionSelect');
+    var input = document.getElementById('actionInput');
+    var hidden = document.getElementById('actionNameHidden');
+
+    // Check if action is in the preset list
+    var presetOptions = Array.from(select.options).map(function (o) { return o.value; });
+    if (presetOptions.indexOf(record.actionName) !== -1 && record.actionName !== '__custom__') {
+        select.value = record.actionName;
+        select.style.display = 'block';
+        input.style.display = 'none';
+        hidden.value = record.actionName;
+    } else {
+        select.value = '__custom__';
+        select.style.display = 'none';
+        input.style.display = 'block';
+        input.value = record.actionName;
+        hidden.value = record.actionName;
+    }
+
+    // Trigger weight label update via change event
+    var evt = document.createEvent('HTMLEvents');
+    evt.initEvent('change', true, false);
+    select.dispatchEvent(evt);
+
+    document.querySelector('[name="weightKg"]').value = record.weightKg;
+    document.querySelector('[name="sets"]').value = record.sets;
+    document.querySelector('[name="reps"]').value = record.reps;
+    document.querySelector('[name="rpe"]').value = record.rpe;
+    document.getElementById('rpeVal').textContent = record.rpe;
+    document.querySelector('[name="recordDate"]').value = record.recordDate;
+
+    var btn = document.querySelector('#trainingForm button[type="submit"]');
+    btn.textContent = '更新记录';
+    document.getElementById('trainingCancelBtn').style.display = 'inline-flex';
+}
+
+function cancelEdit() {
+    editingId = null;
+    var form = document.getElementById('trainingForm');
+    form.reset();
+    document.getElementById('rpeVal').textContent = '7';
+    var btn = document.querySelector('#trainingForm button[type="submit"]');
+    btn.textContent = '提交记录';
+    document.getElementById('trainingCancelBtn').style.display = 'none';
+
+    var select = document.getElementById('actionSelect');
+    select.value = '';
+    select.style.display = 'block';
+    document.getElementById('actionInput').style.display = 'none';
+    document.getElementById('actionNameHidden').value = '';
+    var evt = document.createEvent('HTMLEvents');
+    evt.initEvent('change', true, false);
+    select.dispatchEvent(evt);
+}
+
 document.getElementById('trainingForm').addEventListener('submit', async e => {
     e.preventDefault();
     const fd = new FormData(e.target);
+    const rawWeight = fd.get('weightKg');
+    const actionName = fd.get('actionName');
     const data = {
-        actionName: fd.get('actionName'),
-        weightKg: parseFloat(fd.get('weightKg')),
+        actionName: actionName,
+        weightKg: actionName === '引体向上'
+            ? (rawWeight ? parseFloat(rawWeight) : 0)
+            : parseFloat(rawWeight),
         sets: parseInt(fd.get('sets')),
         reps: parseInt(fd.get('reps')),
         rpe: parseFloat(fd.get('rpe')),
         recordDate: fd.get('recordDate')
     };
     try {
-        await api.post('/training-records', data);
-        showToast('训练记录已保存', 'success');
-        e.target.reset();
-        document.getElementById('rpeVal').textContent = '7';
+        if (editingId) {
+            await api.put('/training-records/' + editingId, data);
+            showToast('训练记录已更新', 'success');
+            cancelEdit();
+        } else {
+            await api.post('/training-records', data);
+            showToast('训练记录已保存', 'success');
+            e.target.reset();
+            document.getElementById('rpeVal').textContent = '7';
+        }
         currentPage = 1;
         loadTable();
         loadChart();
@@ -246,6 +340,24 @@ async function loadVolumeChart() {
     try {
         const data = await api.get('/training-records/weekly-volume') || [];
         renderVolumeChart(data);
+
+        // Update week range label from first data point
+        var rangeEl = document.getElementById('volumeChartRange');
+        if (rangeEl && data && data.length > 0) {
+            var start = data[0].weekStart;
+            if (start) {
+                // Parse start (yyyy-MM-dd), add 6 days for end
+                var parts = start.split('-').map(Number);
+                var startDate = new Date(parts[0], parts[1] - 1, parts[2]);
+                var endDate = new Date(startDate);
+                endDate.setDate(endDate.getDate() + 6);
+                var fmt = function (d) {
+                    return String(d.getMonth() + 1).padStart(2, '0') + '/'
+                        + String(d.getDate()).padStart(2, '0');
+                };
+                rangeEl.textContent = fmt(startDate) + ' ~ ' + fmt(endDate);
+            }
+        }
     } catch (_) {}
 }
 

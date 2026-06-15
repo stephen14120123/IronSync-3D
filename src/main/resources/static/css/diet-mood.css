@@ -25,10 +25,13 @@
     flex-direction: column;
     gap: 5px;
 }
-#dietForm label:nth-child(5),
-#dietForm label:nth-child(6),
-#dietForm button {
+#dietForm label:nth-child(5) {
     grid-column: span 2;
+}
+#dietForm .form-actions {
+    grid-column: span 2;
+    display: flex;
+    gap: 8px;
 }
 
 #dietForm input[type="range"] {
@@ -46,9 +49,14 @@
     text-align: right;
 }
 
-.del-btn {
+#dietMoodChart {
+    width: 100%;
+    height: 280px;
+}
+
+.del-btn, .edit-btn {
     display: inline;
-    padding: 0;
+    padding: 0 2px;
     font-family: var(--font-mono);
     font-size: 12px;
     font-weight: 500;
@@ -61,4 +69,7 @@
 }
 .del-btn:hover {
     color: var(--neon-red);
+}
+.edit-btn:hover {
+    color: var(--neon-cyan);
 }

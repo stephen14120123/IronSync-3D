@@ -13,7 +13,6 @@ import java.time.LocalDate;
 public class BodyMetricsCreateDTO {
 
     @NotNull(message = "日期不能为空")
-    @PastOrPresent(message = "记录日期不能是未来日期")
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     @Schema(description = "记录日期", example = "2025-06-01")
     private LocalDate recordDate;

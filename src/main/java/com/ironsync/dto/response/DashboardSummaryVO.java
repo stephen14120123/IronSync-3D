@@ -29,4 +29,13 @@ public class DashboardSummaryVO {
 
     @Schema(description = "今日平均 RPE", example = "7.5")
     private BigDecimal avgRpe;
+
+    @Schema(description = "本周深蹲总容量 (kg)", example = "4500")
+    private BigDecimal squatVolume;
+
+    @Schema(description = "本周罗马尼亚硬拉总容量 (kg)", example = "3200")
+    private BigDecimal rdlVolume;
+
+    @Schema(description = "本周训练进度百分比 (0-100)", example = "60")
+    private BigDecimal weekProgress;
 }

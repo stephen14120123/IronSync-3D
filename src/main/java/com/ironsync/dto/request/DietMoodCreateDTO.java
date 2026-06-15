@@ -9,11 +9,10 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Data
-@Schema(description = "创建饮食情绪记录请求体")
+@Schema(description = "创建饮食记录请求体")
 public class DietMoodCreateDTO {
 
     @NotNull(message = "日期不能为空")
-    @PastOrPresent(message = "记录日期不能是未来日期")
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     @Schema(description = "记录日期", example = "2025-06-01")
     private LocalDate recordDate;
@@ -32,12 +31,6 @@ public class DietMoodCreateDTO {
     @DecimalMin(value = "0", message = "脂肪摄入量不能为负")
     @Schema(description = "脂肪摄入量(g)", example = "60.0")
     private BigDecimal fatG;
-
-    @NotNull(message = "情绪评分不能为空")
-    @Min(value = 1, message = "情绪评分最低为 1")
-    @Max(value = 10, message = "情绪评分最高为 10")
-    @Schema(description = "情绪评分(1-10)", example = "8")
-    private Integer moodScore;
 
     @Size(max = 500, message = "备注不能超过 500 字")
     @Schema(description = "备注", example = "今天状态不错")

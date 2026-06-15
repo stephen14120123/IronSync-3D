@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ironsync.mapper.MoodMapper">
+
+    <resultMap id="BaseResultMap" type="com.ironsync.entity.MoodRecord">
+        <id property="id" column="id"/>
+        <result property="userId" column="user_id"/>
+        <result property="recordDate" column="record_date"/>
+        <result property="moodScore" column="mood_score"/>
+    </resultMap>
+
+    <sql id="BaseColumns">
+        id, user_id, record_date, mood_score
+    </sql>
+
+    <insert id="insert" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO mood_record (user_id, record_date, mood_score)
+        VALUES (#{userId}, #{recordDate}, #{moodScore})
+    </insert>
+
+    <select id="selectByUserAndDate" resultMap="BaseResultMap">
+        SELECT <include refid="BaseColumns"/>
+        FROM mood_record
+        WHERE user_id = #{userId} AND record_date = #{date}
+        LIMIT 1
+    </select>
+
+    <update id="update">
+        UPDATE mood_record
+        SET mood_score = #{moodScore}
+        WHERE id = #{id}
+    </update>
+
+</mapper>

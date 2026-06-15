@@ -1,9 +1,10 @@
 package com.ironsync.service.impl;
 
+import com.ironsync.common.auth.CurrentUser;
+
 import com.github.pagehelper.Page;
 import com.github.pagehelper.PageHelper;
 import com.github.pagehelper.PageInfo;
-import com.ironsync.common.constant.ActionEnum;
 import com.ironsync.common.exception.ErrorCode;
 import com.ironsync.common.exception.BusinessException;
 import com.ironsync.dto.request.TrainingRecordCreateDTO;
@@ -42,7 +43,7 @@ public class TrainingRecordServiceImpl implements TrainingRecordService {
     public TrainingRecordVO create(TrainingRecordCreateDTO dto) {
         TrainingRecord entity = new TrainingRecord();
         BeanUtils.copyProperties(dto, entity);
-        entity.setUserId(1L);
+        entity.setUserId(CurrentUser.getUserId());
         entity.setDeleted(0);
         trainingRecordMapper.insert(entity);
         return toVO(entity);
@@ -56,7 +57,7 @@ public class TrainingRecordServiceImpl implements TrainingRecordService {
             throw new BusinessException(ErrorCode.TRAINING_RECORD_NOT_FOUND);
         }
         BeanUtils.copyProperties(dto, entity);
-        entity.setUserId(1L);
+        entity.setUserId(CurrentUser.getUserId());
         trainingRecordMapper.update(entity);
         return toVO(entity);
     }
@@ -75,19 +76,19 @@ public class TrainingRecordServiceImpl implements TrainingRecordService {
 
     @Override
     public List<TrainingRecordVO> findByDate(LocalDate date) {
-        List<TrainingRecord> list = trainingRecordMapper.selectByRecordDate(date);
+        List<TrainingRecord> list = trainingRecordMapper.selectByRecordDate(CurrentUser.getUserId(), date);
         if (list == null || list.isEmpty()) return Collections.emptyList();
         return list.stream().map(this::toVO).collect(Collectors.toList());
     }
 
     @Override
     public List<TrainingRecord> findByDateRaw(LocalDate date) {
-        return trainingRecordMapper.selectByRecordDate(date);
+        return trainingRecordMapper.selectByRecordDate(CurrentUser.getUserId(), date);
     }
 
     @Override
     public List<TrainingRecordVO> findAll() {
-        List<TrainingRecord> list = trainingRecordMapper.selectAll(1L);
+        List<TrainingRecord> list = trainingRecordMapper.selectAll(CurrentUser.getUserId());
         if (list == null || list.isEmpty()) return Collections.emptyList();
         return list.stream().map(this::toVO).collect(Collectors.toList());
     }
@@ -95,7 +96,7 @@ public class TrainingRecordServiceImpl implements TrainingRecordService {
     @Override
     public PageInfo<TrainingRecordVO> findAll(int page, int size) {
         PageHelper.startPage(page, size);
-        List<TrainingRecord> list = trainingRecordMapper.selectAll(1L);
+        List<TrainingRecord> list = trainingRecordMapper.selectAll(CurrentUser.getUserId());
         List<TrainingRecordVO> voList = list.stream().map(this::toVO).collect(Collectors.toList());
 
         PageInfo<TrainingRecordVO> pageInfo = new PageInfo<>(voList);
@@ -111,14 +112,14 @@ public class TrainingRecordServiceImpl implements TrainingRecordService {
 
     @Override
     public List<TrainingRecordVO> findAllForChart() {
-        List<TrainingRecord> list = trainingRecordMapper.selectAll(1L);
+        List<TrainingRecord> list = trainingRecordMapper.selectRecent(CurrentUser.getUserId());
         if (list == null || list.isEmpty()) return Collections.emptyList();
         return list.stream().map(this::toVO).collect(Collectors.toList());
     }
 
     @Override
     public BigDecimal calculateTodayCalories() {
-        List<TrainingRecord> todayRecords = trainingRecordMapper.selectByRecordDate(LocalDate.now());
+        List<TrainingRecord> todayRecords = trainingRecordMapper.selectByRecordDate(CurrentUser.getUserId(), LocalDate.now());
         if (todayRecords == null || todayRecords.isEmpty()) {
             return BigDecimal.ZERO;
         }
@@ -134,7 +135,7 @@ public class TrainingRecordServiceImpl implements TrainingRecordService {
     public List<WeeklyVolumeVO> getWeeklyVolume() {
         LocalDate now = LocalDate.now();
         // 最近 4 周，从当前周周一开始
-        List<TrainingRecord> allRecords = trainingRecordMapper.selectAll(1L);
+        List<TrainingRecord> allRecords = trainingRecordMapper.selectRecent(CurrentUser.getUserId());
         if (allRecords == null || allRecords.isEmpty()) return Collections.emptyList();
 
         Map<String, BigDecimal> weekMap = new LinkedHashMap<>();
@@ -168,7 +169,7 @@ public class TrainingRecordServiceImpl implements TrainingRecordService {
         if (entity == null) return null;
         TrainingRecordVO vo = new TrainingRecordVO();
         BeanUtils.copyProperties(entity, vo);
-        vo.setActionName(entity.getActionName().getDisplayName());
+        vo.setActionName(entity.getActionName());
         return vo;
     }
 }

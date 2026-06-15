@@ -25,9 +25,13 @@
     flex-direction: column;
     gap: 5px;
 }
-#metricsForm label:nth-child(4),
-#metricsForm button {
+#metricsForm label:nth-child(4) {
     grid-column: span 2;
+}
+#metricsForm .form-actions {
+    grid-column: span 2;
+    display: flex;
+    gap: 8px;
 }
 
 #metricsTable th:last-child,
@@ -35,9 +39,14 @@
     text-align: right;
 }
 
-.del-btn {
+#bodyMetricsChart {
+    width: 100%;
+    height: 280px;
+}
+
+.del-btn, .edit-btn {
     display: inline;
-    padding: 0;
+    padding: 0 2px;
     font-family: var(--font-mono);
     font-size: 12px;
     font-weight: 500;
@@ -50,4 +59,7 @@
 }
 .del-btn:hover {
     color: var(--neon-red);
+}
+.edit-btn:hover {
+    color: var(--neon-cyan);
 }

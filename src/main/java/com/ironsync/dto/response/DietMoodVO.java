@@ -8,7 +8,7 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Data
-@Schema(description = "饮食情绪记录响应体")
+@Schema(description = "饮食记录响应体")
 public class DietMoodVO {
     @Schema(description = "记录 ID", example = "1")
     private Long id;
@@ -25,9 +25,6 @@ public class DietMoodVO {
 
     @Schema(description = "脂肪摄入量(g)", example = "60.0")
     private BigDecimal fatG;
-
-    @Schema(description = "情绪评分(1-10)", example = "8")
-    private Integer moodScore;
 
     @Schema(description = "备注", example = "今天状态不错")
     private String note;

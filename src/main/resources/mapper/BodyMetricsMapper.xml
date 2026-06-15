@@ -49,6 +49,7 @@
         WHERE user_id = #{userId}
         AND record_date BETWEEN #{from} AND #{to}
         ORDER BY record_date ASC
+        LIMIT 50
     </select>
 
 </mapper>

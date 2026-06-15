@@ -1,6 +1,5 @@
 package com.ironsync.dto.request;
 
-import com.ironsync.common.constant.ActionEnum;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.validation.constraints.*;
 import lombok.Data;
@@ -13,14 +12,14 @@ import java.time.LocalDate;
 @Schema(description = "创建训练记录请求体")
 public class TrainingRecordCreateDTO {
 
-    @NotNull(message = "动作名称不能为空")
+    @NotBlank(message = "动作名称不能为空")
     @Schema(description = "动作名称", example = "杠铃深蹲")
-    private ActionEnum actionName;
+    private String actionName;
 
     @NotNull(message = "重量不能为空")
-    @DecimalMin(value = "1.0", message = "重量不能小于 1kg")
+    @DecimalMin(value = "0.0", message = "重量不能为负数")
     @DecimalMax(value = "999.0", message = "重量不能超过 999kg")
-    @Schema(description = "使用重量(kg)", example = "80.0")
+    @Schema(description = "使用重量(kg)，自重动作可填 0", example = "80.0")
     private BigDecimal weightKg;
 
     @NotNull(message = "次数不能为空")
@@ -41,7 +40,6 @@ public class TrainingRecordCreateDTO {
     private BigDecimal rpe;
 
     @NotNull(message = "日期不能为空")
-    @PastOrPresent(message = "训练日期不能是未来日期")
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     @Schema(description = "训练日期", example = "2025-06-01")
     private LocalDate recordDate;

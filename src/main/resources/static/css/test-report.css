@@ -1,116 +1,131 @@
 /* ============================================================
    IronSync-3D · Test Report (Glassmorphism)
+   — Glass stat blocks + terminal-style test log
    ============================================================ */
 
 .page-container {
     padding: 72px 28px 24px;
-    display: grid;
-    grid-template-columns: 240px 1fr;
+    display: flex;
+    flex-direction: column;
     gap: 20px;
     height: 100vh;
-    overflow: hidden;
+    overflow-y: auto;
 }
 
-/* ---- Left Overview (glass) ---- */
-.overview-panel {
+/* ---- Test Log Console ---- */
+.console-panel {
     background: var(--glass-bg);
     backdrop-filter: blur(var(--glass-blur));
     -webkit-backdrop-filter: blur(var(--glass-blur));
     border: var(--border-w) solid var(--glass-border);
     border-radius: var(--radius-card);
-    padding: 20px;
+    padding: 16px;
+    flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 16px;
+    overflow: hidden;
 }
 
-.badge-item {
-    display: flex;
-    justify-content: space-between;
-    font-size: 12px;
-    padding: 6px 0;
-    border-bottom: var(--border-w) solid var(--glass-border);
-}
-.badge-label {
-    color: var(--text-secondary);
-    font-size: 11px;
-    letter-spacing: var(--tracking);
-}
-.badge-value {
-    color: var(--text-primary);
-    font-weight: 700;
-    font-family: var(--font-mono);
-    font-size: 13px;
-}
-
-.badge-row {
-    display: flex;
-    gap: 8px;
-}
-.badge-box {
-    flex: 1;
-    text-align: center;
-    padding: 12px 8px;
-    background: var(--glass-bg);
-    backdrop-filter: blur(8px);
-    border: var(--border-w) solid var(--glass-border);
-    border-radius: var(--radius-btn);
-}
-.badge-num {
-    display: block;
-    font-size: 24px;
-    font-weight: 900;
-    line-height: 1.2;
-    font-family: var(--font-mono);
-}
-.badge-desc {
+.console-header {
     font-size: 10px;
-    font-weight: 600;
+    font-weight: 700;
     letter-spacing: var(--tracking-wide);
     text-transform: uppercase;
     color: var(--text-muted);
-    margin-top: 4px;
-}
-.box-total .badge-num { color: var(--text-primary); }
-.box-pass  .badge-num { color: var(--neon-green); }
-.box-fail  .badge-num { color: var(--neon-red); }
-
-/* ---- Right iframe (glass) ---- */
-.report-container {
-    position: relative;
-    background: var(--glass-bg);
-    backdrop-filter: blur(var(--glass-blur));
-    -webkit-backdrop-filter: blur(var(--glass-blur));
-    border: var(--border-w) solid var(--glass-border);
-    border-radius: var(--radius-card);
-    overflow: hidden;
-}
-#reportIframe {
-    width: 100%;
-    height: 100%;
-    border: none;
-}
-
-.fallback-msg {
-    display: none;
-    position: absolute;
-    inset: 0;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    gap: 12px;
-    color: var(--text-secondary);
-}
-.fallback-text {
-    font-size: 16px;
-    font-weight: 700;
-    color: var(--text-primary);
-    letter-spacing: var(--tracking);
-}
-.fallback-sub {
-    font-size: 12px;
-    color: var(--text-muted);
-    max-width: 280px;
-    text-align: center;
+    margin-bottom: 10px;
+    padding-bottom: 6px;
+    border-bottom: var(--border-w) solid var(--glass-border);
     font-family: var(--font-mono);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
+
+.console-header .badge-summary {
+    font-size: 10px;
+    color: var(--text-disabled);
+}
+
+.console-log {
+    flex: 1;
+    overflow-y: auto;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    line-height: 1.7;
+}
+
+/* ---- Log Entry ---- */
+.log-entry {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 3px 0;
+    border-bottom: var(--border-w) solid rgba(255, 255, 255, 0.02);
+}
+.log-entry:last-child {
+    border-bottom: none;
+}
+
+.log-status {
+    flex-shrink: 0;
+    width: 40px;
+    text-align: right;
+    font-weight: 700;
+    font-size: 11px;
+}
+.log-status.pass  { color: var(--neon-green); }
+.log-status.fail  { color: var(--neon-red); }
+.log-status.skip  { color: var(--text-disabled); }
+.log-status.info  { color: var(--neon-cyan); }
+.log-status.warn  { color: var(--neon-amber); }
+
+.log-step {
+    flex-shrink: 0;
+    width: 24px;
+    text-align: right;
+    color: var(--text-disabled);
+    font-size: 10px;
+}
+
+.log-name {
+    flex: 1;
+    color: var(--text-primary);
+}
+
+.log-duration {
+    flex-shrink: 0;
+    color: var(--text-disabled);
+    font-size: 10px;
+    margin-left: 12px;
+}
+
+/* ---- Console meta line ---- */
+.log-meta {
+    color: var(--text-muted);
+    font-size: 11px;
+    padding: 2px 0;
+}
+.log-meta .meta-key {
+    color: var(--neon-orange);
+}
+.log-meta .meta-val {
+    color: var(--text-primary);
+}
+
+/* ---- Summary bar at bottom of console ---- */
+.console-summary {
+    margin-top: 10px;
+    padding-top: 8px;
+    border-top: var(--border-w) solid var(--glass-border);
+    font-family: var(--font-mono);
+    font-size: 11px;
+    display: flex;
+    justify-content: space-between;
+    color: var(--text-muted);
+}
+.console-summary .verdict {
+    font-weight: 700;
+    letter-spacing: var(--tracking-wide);
+}
+.console-summary .verdict.pass { color: var(--neon-green); }
+.console-summary .verdict.fail { color: var(--neon-red); }

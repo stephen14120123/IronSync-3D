@@ -58,12 +58,15 @@ public class TrainingRecordController {
         return Result.success(trainingRecordService.findById(id));
     }
 
-    @Operation(summary = "分页查询训练记录", description = "分页获取训练记录列表，支持页码和每页条数参数")
+    @Operation(summary = "分页查询训练记录", description = "分页获取训练记录列表，支持页码和每页条数参数（size 上限 50）")
     @ApiResponse(responseCode = "200", description = "成功返回分页数据")
     @GetMapping
     public Result<PageInfo<TrainingRecordVO>> findAll(
             @RequestParam(defaultValue = "1") int page,
             @RequestParam(defaultValue = "10") int size) {
+        // 防御性上限：防全表扫描
+        if (size > 50) size = 50;
+        if (page < 1) page = 1;
         return Result.success(trainingRecordService.findAll(page, size));
     }
 

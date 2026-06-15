@@ -1,5 +1,7 @@
 package com.ironsync.service.impl;
 
+import com.ironsync.common.auth.CurrentUser;
+
 import com.ironsync.common.exception.BusinessException;
 import com.ironsync.common.exception.ErrorCode;
 import com.ironsync.dto.request.DietMoodCreateDTO;
@@ -31,7 +33,7 @@ public class DietMoodServiceImpl implements DietMoodService {
     public DietMoodVO create(DietMoodCreateDTO dto) {
         DietMood entity = new DietMood();
         BeanUtils.copyProperties(dto, entity);
-        entity.setUserId(1L);
+        entity.setUserId(CurrentUser.getUserId());
         dietMoodMapper.insert(entity);
         return toVO(entity);
     }
@@ -44,7 +46,7 @@ public class DietMoodServiceImpl implements DietMoodService {
             throw new BusinessException(ErrorCode.DIET_MOOD_NOT_FOUND);
         }
         BeanUtils.copyProperties(dto, entity);
-        entity.setUserId(1L);
+        entity.setUserId(CurrentUser.getUserId());
         dietMoodMapper.update(entity);
         return toVO(entity);
     }
@@ -63,7 +65,7 @@ public class DietMoodServiceImpl implements DietMoodService {
 
     @Override
     public List<DietMoodVO> findByDateRange(LocalDate from, LocalDate to) {
-        List<DietMood> list = dietMoodMapper.selectByDateRange(1L, from, to);
+        List<DietMood> list = dietMoodMapper.selectByDateRange(CurrentUser.getUserId(), from, to);
         if (list == null || list.isEmpty()) return Collections.emptyList();
         return list.stream().map(this::toVO).collect(Collectors.toList());
     }

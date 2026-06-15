@@ -39,9 +39,13 @@
     flex-direction: column;
     gap: 5px;
 }
-#trainingForm label:nth-child(5),
-#trainingForm button {
+#trainingForm label:nth-child(5) {
     grid-column: span 2;
+}
+#trainingForm .form-actions {
+    grid-column: span 2;
+    display: flex;
+    gap: 8px;
 }
 
 #trainingForm input[type="range"] {
@@ -74,4 +78,63 @@
 }
 .delete-btn:hover {
     color: var(--neon-red);
+}
+
+/* ---- Action combo box ---- */
+.action-combo {
+    position: relative;
+}
+
+.combo-select,
+.combo-input {
+    width: 100%;
+    padding: 11px 16px;
+    background: rgba(0, 0, 0, 0.30);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: var(--border-w) solid var(--glass-border);
+    border-radius: var(--radius-input);
+    color: var(--text-primary);
+    font-family: var(--font-sans);
+    font-size: 14px;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+    box-sizing: border-box;
+}
+
+.combo-select:focus,
+.combo-input:focus {
+    border-color: var(--neon-orange);
+    box-shadow: 0 0 16px rgba(255, 107, 0, 0.08);
+}
+
+.combo-input {
+    padding: 11px 16px;
+}
+
+select.combo-select {
+    appearance: auto;
+    -webkit-appearance: auto;
+}
+
+/* ---- Chart header with week range ---- */
+.chart-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 12px;
+}
+.chart-header-title {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: var(--tracking-wide);
+    text-transform: uppercase;
+    color: var(--text-muted);
+}
+.chart-header-range {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-disabled);
+    font-family: var(--font-mono);
+    letter-spacing: 0.02em;
 }

@@ -1,5 +1,7 @@
 package com.ironsync.service.impl;
 
+import com.ironsync.common.auth.CurrentUser;
+
 import com.ironsync.common.exception.BusinessException;
 import com.ironsync.common.exception.ErrorCode;
 import com.ironsync.dto.request.BodyMetricsCreateDTO;
@@ -31,7 +33,7 @@ public class BodyMetricsServiceImpl implements BodyMetricsService {
     public BodyMetricsVO create(BodyMetricsCreateDTO dto) {
         BodyMetrics entity = new BodyMetrics();
         BeanUtils.copyProperties(dto, entity);
-        entity.setUserId(1L);
+        entity.setUserId(CurrentUser.getUserId());
         bodyMetricsMapper.insert(entity);
         return toVO(entity);
     }
@@ -44,7 +46,7 @@ public class BodyMetricsServiceImpl implements BodyMetricsService {
             throw new BusinessException(ErrorCode.BODY_METRICS_NOT_FOUND);
         }
         BeanUtils.copyProperties(dto, entity);
-        entity.setUserId(1L);
+        entity.setUserId(CurrentUser.getUserId());
         bodyMetricsMapper.update(entity);
         return toVO(entity);
     }
@@ -63,7 +65,7 @@ public class BodyMetricsServiceImpl implements BodyMetricsService {
 
     @Override
     public List<BodyMetricsVO> findByDateRange(LocalDate from, LocalDate to) {
-        List<BodyMetrics> list = bodyMetricsMapper.selectByDateRange(1L, from, to);
+        List<BodyMetrics> list = bodyMetricsMapper.selectByDateRange(CurrentUser.getUserId(), from, to);
         if (list == null || list.isEmpty()) return Collections.emptyList();
         return list.stream().map(this::toVO).collect(Collectors.toList());
     }

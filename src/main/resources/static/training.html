@@ -6,25 +6,37 @@
     <title>核心训练记录 — IronSync-3D</title>
     <link rel="stylesheet" href="css/global.css">
     <link rel="stylesheet" href="css/training.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/echarts/5.5.0/echarts.min.js"></script>
+    <script src="js/echarts.min.js"></script>
     <style>
         #volume-chart-container { margin-top: 16px; }
         #volumeChart { width: 100%; height: 200px; }
+        #strengthTrendChart { width: 100%; height: 280px; }
+        #volume-chart-container,
+        #trend-chart-container {
+            background: var(--glass-bg);
+            backdrop-filter: blur(var(--glass-blur));
+            -webkit-backdrop-filter: blur(var(--glass-blur));
+            border: var(--border-w) solid var(--glass-border);
+            border-radius: var(--radius-card);
+            padding: 18px;
+        }
     </style>
 </head>
 <body>
     <div id="glass-bg-orb"></div>
     <div id="top-bar">
-        <div class="logo">IRON<span>SYNC</span> 3D</div>
+        <div class="logo">IRON<span>SYNC</span> <small class="logo-dot">⏺</small></div>
         <nav>
             <a href="/">仪表盘</a>
-            <a href="/training.html" class="active">训练记录</a>
-            <a href="/supplements.html">补剂管家</a>
-            <a href="/diet-mood.html">饮食情绪</a>
-            <a href="/body-metrics.html">身体指标</a>
-            <a href="/mcp-search.html">日记检索</a>
-            <a href="/test-report.html">测试报告</a>
+            <a href="/training.html" class="active">训练</a>
+            <a href="/body-metrics.html">指标</a>
+            <a href="/diet-mood.html">饮食</a>
+            <a href="/supplements.html">补剂</a>
         </nav>
+        <div class="nav-right">
+            <span class="nav-user" id="navUser">—</span>
+            <button class="btn-logout" id="btnLogout" title="退出登录">↩ 退出</button>
+        </div>
     </div>
 
     <div class="page-container">
@@ -33,6 +45,10 @@
         </div>
 
         <div id="volume-chart-container">
+            <div class="chart-header">
+                <span class="chart-header-title">本周训练容量</span>
+                <span class="chart-header-range" id="volumeChartRange"></span>
+            </div>
             <div id="volumeChart"></div>
         </div>
 
@@ -41,17 +57,23 @@
                 <h3>录入训练记录</h3>
                 <form id="trainingForm">
                     <label>动作名称
-                        <select name="actionName" required>
-                            <option value="">— 请选择 —</option>
-                            <option>杠铃深蹲</option>
-                            <option>罗马尼亚硬拉</option>
-                            <option>卧推</option>
-                            <option>推举</option>
-                            <option>引体向上</option>
-                        </select>
+                        <div class="action-combo">
+                            <select id="actionSelect" class="combo-select">
+                                <option value="">— 请选择 —</option>
+                                <option>杠铃深蹲</option>
+                                <option>罗马尼亚硬拉</option>
+                                <option>卧推</option>
+                                <option>推举</option>
+                                <option>引体向上</option>
+                                <option value="__custom__">✎ 自定义输入</option>
+                            </select>
+                            <input type="text" id="actionInput" class="combo-input" style="display:none"
+                                   placeholder="输入动作名称..." maxlength="50">
+                            <input type="hidden" name="actionName" id="actionNameHidden">
+                        </div>
                     </label>
-                    <label>重量 (kg)
-                        <input type="number" name="weightKg" step="0.5" min="1" max="999" required>
+                    <label id="weightLabel">重量 (kg)
+                        <input type="number" name="weightKg" id="weightInput" step="0.5" min="0" max="999" required>
                     </label>
                     <label>组数
                         <input type="number" name="sets" min="1" max="50" required>
@@ -67,7 +89,10 @@
                     <label>日期
                         <input type="date" name="recordDate" required>
                     </label>
-                    <button type="submit">提交记录</button>
+                    <div class="form-actions">
+                        <button type="submit" class="btn btn-primary" id="trainingSubmitBtn">提交记录</button>
+                        <button type="button" class="btn btn-ghost" id="trainingCancelBtn" style="display:none" onclick="cancelEdit()">取消编辑</button>
+                    </div>
                 </form>
             </div>
 
@@ -97,5 +122,75 @@
 
     <script src="js/api.js"></script>
     <script src="js/training.js"></script>
+    <script>
+    // ---- Action combo box: select + custom input ----
+    (function () {
+        var select = document.getElementById('actionSelect');
+        var input = document.getElementById('actionInput');
+        var hidden = document.getElementById('actionNameHidden');
+        var form = document.getElementById('trainingForm');
+        var weightLabel = document.getElementById('weightLabel');
+        var weightInput = document.getElementById('weightInput');
+
+        function updateWeightLabel(action) {
+            if (action === '引体向上') {
+                weightLabel.innerHTML = '附加负重 (kg)<input type="number" name="weightKg" id="weightInput" step="0.5" min="0" max="999" placeholder="0（自重）">';
+            } else {
+                weightLabel.innerHTML = '重量 (kg)<input type="number" name="weightKg" id="weightInput" step="0.5" min="0" max="999" required>';
+            }
+            // Re-bind variable
+            weightInput = document.getElementById('weightInput');
+        }
+
+        function syncHidden() {
+            if (select.value === '__custom__') {
+                select.style.display = 'none';
+                input.style.display = 'block';
+                input.focus();
+                hidden.value = input.value;
+                updateWeightLabel(input.value);
+            } else {
+                select.style.display = 'block';
+                input.style.display = 'none';
+                hidden.value = select.value;
+                updateWeightLabel(select.value);
+            }
+        }
+
+        select.addEventListener('change', syncHidden);
+        input.addEventListener('input', function () {
+            hidden.value = input.value;
+            updateWeightLabel(input.value);
+        });
+
+        // Before form submit: if 引体向上 with empty weight, set to 0
+        form.addEventListener('submit', function () {
+            if (select.value === '__custom__') {
+                hidden.value = input.value;
+            }
+            var action = hidden.value;
+            if (action === '引体向上') {
+                var w = document.getElementById('weightInput');
+                if (!w.value || parseFloat(w.value) === 0 || isNaN(parseFloat(w.value))) {
+                    w.value = '0';
+                }
+            }
+        });
+
+        // Reset handler
+        var origReset = form.reset.bind(form);
+        form.reset = function () {
+            origReset();
+            select.value = '';
+            select.style.display = 'block';
+            input.style.display = 'none';
+            hidden.value = '';
+            updateWeightLabel('');
+        };
+
+        // Init
+        updateWeightLabel(select.value);
+    })();
+    </script>
 </body>
 </html>

@@ -12,12 +12,10 @@ import java.time.LocalDate;
 @Schema(description = "更新身体指标请求体")
 public class BodyMetricsUpdateDTO {
 
-    @NotNull(message = "记录 ID 不能为空")
     @Schema(description = "记录 ID", example = "1")
     private Long id;
 
     @NotNull(message = "日期不能为空")
-    @PastOrPresent(message = "记录日期不能是未来日期")
     @JsonFormat(pattern = "yyyy-MM-dd", timezone = "GMT+8")
     @Schema(description = "记录日期", example = "2025-06-01")
     private LocalDate recordDate;

@@ -10,51 +10,58 @@
 <body>
     <div id="glass-bg-orb"></div>
     <div id="top-bar">
-        <div class="logo">IRON<span>SYNC</span> 3D</div>
+        <div class="logo">IRON<span>SYNC</span> <small class="logo-dot">⏺</small></div>
         <nav>
             <a href="/">仪表盘</a>
-            <a href="/training.html">训练记录</a>
-            <a href="/supplements.html">补剂管家</a>
-            <a href="/diet-mood.html">饮食情绪</a>
-            <a href="/body-metrics.html">身体指标</a>
-            <a href="/mcp-search.html">日记检索</a>
-            <a href="/test-report.html" class="active">测试报告</a>
+            <a href="/training.html">训练</a>
+            <a href="/body-metrics.html">指标</a>
+            <a href="/diet-mood.html">饮食</a>
+            <a href="/supplements.html">补剂</a>
+            <a href="/mcp-search.html">日记</a>
         </nav>
+        <div class="nav-right">
+            <span class="nav-user" id="navUser">—</span>
+            <button class="btn-logout" id="btnLogout" title="退出登录">↩ 退出</button>
+        </div>
     </div>
 
     <div class="page-container">
-        <div class="overview-panel" id="overviewPanel">
-            <h3>最近一次测试</h3>
-            <div class="badge-list">
-                <div class="badge-item">
-                    <span class="badge-label">时间</span>
-                    <span class="badge-value" id="reportTime">--</span>
-                </div>
-                <div class="badge-row">
-                    <div class="badge status-total">
-                        <span class="badge-num" id="totalCount">--</span>
-                        <span class="badge-desc">总计</span>
-                    </div>
-                    <div class="badge status-pass">
-                        <span class="badge-num" id="passCount">--</span>
-                        <span class="badge-desc">通过</span>
-                    </div>
-                    <div class="badge status-fail">
-                        <span class="badge-num" id="failCount">--</span>
-                        <span class="badge-desc">失败</span>
-                    </div>
-                </div>
+        <div class="stat-row" id="statRow">
+            <div class="stat-block block-total">
+                <span class="num" id="statTotal">--</span>
+                <span class="label">测试用例</span>
+                <span class="sub">total</span>
+            </div>
+            <div class="stat-block block-pass">
+                <span class="num" id="statPass">--</span>
+                <span class="label">通过</span>
+                <span class="sub">passed</span>
+            </div>
+            <div class="stat-block block-fail">
+                <span class="num" id="statFail">--</span>
+                <span class="label">失败</span>
+                <span class="sub">failed</span>
+            </div>
+            <div class="stat-block block-time">
+                <span class="num" id="statTime">--</span>
+                <span class="label">执行耗时</span>
+                <span class="sub">duration</span>
             </div>
         </div>
 
-        <div class="report-container">
-            <iframe id="reportIframe" src="/test-reports/latest/index.html"
-                    onerror="this.style.display='none';document.getElementById('fallbackMsg').style.display='block';"
-                    onload="checkIframeLoaded(this)"></iframe>
-            <div id="fallbackMsg" class="fallback-msg">
-                <div class="fallback-icon">📋</div>
-                <div class="fallback-text">暂无测试报告</div>
-                <div class="fallback-sub">请执行 CI/CD 部署流水线以生成 Playwright 测试报告</div>
+        <div class="console-panel">
+            <div class="console-header">
+                <span>PIPELINE LOG</span>
+                <span class="badge-summary" id="pipelineSummary">waiting...</span>
+            </div>
+            <div class="console-log" id="consoleLog">
+                <div class="log-meta">
+                    <span class="meta-key">$</span> <span class="meta-val">初始化测试引擎...</span>
+                </div>
+            </div>
+            <div class="console-summary" id="consoleSummary">
+                <span>--</span>
+                <span class="verdict">--</span>
             </div>
         </div>
     </div>

@@ -10,17 +10,16 @@
         <result property="carbsG" column="carbs_g"/>
         <result property="proteinG" column="protein_g"/>
         <result property="fatG" column="fat_g"/>
-        <result property="moodScore" column="mood_score"/>
         <result property="note" column="note"/>
     </resultMap>
 
     <sql id="BaseColumns">
-        id, user_id, record_date, carbs_g, protein_g, fat_g, mood_score, note
+        id, user_id, record_date, carbs_g, protein_g, fat_g, note
     </sql>
 
     <insert id="insert" useGeneratedKeys="true" keyProperty="id">
-        INSERT INTO diet_mood (user_id, record_date, carbs_g, protein_g, fat_g, mood_score, note)
-        VALUES (#{userId}, #{recordDate}, #{carbsG}, #{proteinG}, #{fatG}, #{moodScore}, #{note})
+        INSERT INTO diet_mood (user_id, record_date, carbs_g, protein_g, fat_g, note)
+        VALUES (#{userId}, #{recordDate}, #{carbsG}, #{proteinG}, #{fatG}, #{note})
     </insert>
 
     <select id="selectById" resultMap="BaseResultMap">
@@ -37,7 +36,6 @@
             <if test="carbsG != null">carbs_g = #{carbsG},</if>
             <if test="proteinG != null">protein_g = #{proteinG},</if>
             <if test="fatG != null">fat_g = #{fatG},</if>
-            <if test="moodScore != null">mood_score = #{moodScore},</if>
             <if test="note != null">note = #{note},</if>
         </set>
         WHERE id = #{id}
@@ -53,6 +51,7 @@
         WHERE user_id = #{userId}
         AND record_date BETWEEN #{from} AND #{to}
         ORDER BY record_date ASC
+        LIMIT 50
     </select>
 
 </mapper>

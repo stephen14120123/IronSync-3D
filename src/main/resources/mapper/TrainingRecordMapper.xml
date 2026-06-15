@@ -6,7 +6,7 @@
     <resultMap id="BaseResultMap" type="com.ironsync.entity.TrainingRecord">
         <id property="id" column="id"/>
         <result property="userId" column="user_id"/>
-        <result property="actionName" column="action_name" typeHandler="com.ironsync.common.handler.ActionEnumTypeHandler"/>
+        <result property="actionName" column="action_name"/>
         <result property="weightKg" column="weight_kg"/>
         <result property="reps" column="reps"/>
         <result property="sets" column="sets"/>
@@ -48,17 +48,33 @@
         UPDATE training_record SET deleted = 1 WHERE id = #{id}
     </delete>
 
-    <select id="selectByRecordDate" resultMap="BaseResultMap">
-        SELECT <include refid="BaseColumns"/>
-        FROM training_record
-        WHERE record_date = #{date} AND deleted = 0
-    </select>
-
     <select id="selectAll" resultMap="BaseResultMap">
         SELECT <include refid="BaseColumns"/>
         FROM training_record
         WHERE user_id = #{userId} AND deleted = 0
         ORDER BY record_date DESC, id DESC
+    </select>
+
+    <select id="selectRecent" resultMap="BaseResultMap">
+        SELECT <include refid="BaseColumns"/>
+        FROM training_record
+        WHERE user_id = #{userId} AND deleted = 0
+        ORDER BY record_date DESC, id DESC
+        LIMIT 50
+    </select>
+
+    <select id="selectByRecordDate" resultMap="BaseResultMap">
+        SELECT <include refid="BaseColumns"/>
+        FROM training_record
+        WHERE user_id = #{userId} AND record_date = #{date} AND deleted = 0
+        ORDER BY id DESC
+        LIMIT 50
+    </select>
+
+    <select id="countDistinctTrainingDays" resultType="long">
+        SELECT COUNT(DISTINCT record_date)
+        FROM training_record
+        WHERE user_id = #{userId} AND deleted = 0
     </select>
 
 </mapper>

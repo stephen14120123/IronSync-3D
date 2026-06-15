@@ -1,5 +1,7 @@
 package com.ironsync.service.impl;
 
+import com.ironsync.common.auth.CurrentUser;
+
 import com.ironsync.common.exception.BusinessException;
 import com.ironsync.common.exception.ErrorCode;
 import com.ironsync.dto.request.SupplementCreateDTO;
@@ -35,7 +37,7 @@ public class SupplementServiceImpl implements SupplementService {
     public SupplementVO create(SupplementCreateDTO dto) {
         Supplement entity = new Supplement();
         BeanUtils.copyProperties(dto, entity);
-        entity.setUserId(1L);
+        entity.setUserId(CurrentUser.getUserId());
         entity.setCreatedAt(LocalDateTime.now());
         supplementMapper.insert(entity);
         return toVO(entity);
@@ -49,7 +51,7 @@ public class SupplementServiceImpl implements SupplementService {
             throw new BusinessException(ErrorCode.SUPPLEMENT_NOT_FOUND);
         }
         BeanUtils.copyProperties(dto, entity);
-        entity.setUserId(1L);
+        entity.setUserId(CurrentUser.getUserId());
         supplementMapper.update(entity);
         return toVO(entity);
     }
@@ -68,7 +70,7 @@ public class SupplementServiceImpl implements SupplementService {
 
     @Override
     public List<SupplementVO> findAll() {
-        return supplementMapper.selectAll().stream()
+        return supplementMapper.selectAll(CurrentUser.getUserId()).stream()
                 .map(this::toVO)
                 .sorted(Comparator.comparingInt(this::statusOrder))
                 .collect(Collectors.toList());
@@ -76,7 +78,7 @@ public class SupplementServiceImpl implements SupplementService {
 
     @Override
     public List<SupplementStatusVO> getStatusList() {
-        return supplementMapper.selectAll().stream()
+        return supplementMapper.selectAll(CurrentUser.getUserId()).stream()
                 .map(this::toStatusVO)
                 .sorted(Comparator.comparingInt(vo -> statusOrder(vo.getStatus())))
                 .collect(Collectors.toList());
